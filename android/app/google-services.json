@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "304364720194",
+    "project_id": "kid-cruiser-goat",
+    "storage_bucket": "kid-cruiser-goat.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:304364720194:android:bacd9d16a1f7b5cf571ddb",
+        "android_client_info": {
+          "package_name": "com.mengaaslan.mobile_dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDfAWVlB6r-MK7nNGBftYSkqN5gir__QSg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
