@@ -1,3 +1,10 @@
+enum LoginResult {
+  success,
+  invalidPhoneNumberOrPassword,
+  phoneNumberNotExist,
+  error,
+}
+
 abstract class AbstractController{
   String? errorMessage="";
 
@@ -26,7 +33,7 @@ abstract class AbstractController{
       return 'Phone number cannot be empty';
     }
     if (!RegExp(r'^05\d{9}$').hasMatch(value)) {
-      return 'Phone number must start with 05 and be 11 digits long';
+      return '0-(5xx)-xxx-xxxx';
     }
     return null;
   }
@@ -45,7 +52,7 @@ abstract class AbstractController{
       return 'Password cannot be empty';
     }
     if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$').hasMatch(value)) {
-      return 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one digit';
+      return 'At least one lowercase, one \nuppercase letter and one number is required';
     }
     return null;
   }
