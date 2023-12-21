@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_dev/Pages/Select/LogInSelect.dart';
-import 'package:mobile_dev/Pages/Select/RegisterSelect.dart';
+import 'package:mobile_dev/Pages/Select/login_select.dart';
+import 'package:mobile_dev/Pages/Select/register_select.dart';
 
 
 
