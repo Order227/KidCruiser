@@ -189,7 +189,7 @@ class ParentBase extends StatelessWidget {
                       height: heightbutton / 1.5,
                       alignment: Alignment.center,
                       child: Text(
-                        'Go Back',
+                        'Log Out',
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 20,

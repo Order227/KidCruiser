@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_dev/Controller/Concretes/Input/InputController.dart';
 import 'package:mobile_dev/Controller/Concretes/Parent/ParentController.dart';
 import 'package:mobile_dev/Controller/Concretes/School/SchoolController.dart';
+import 'package:mobile_dev/Pages/Parent/ParentBase.dart';
 
 class AddChildPage extends StatefulWidget {
   @override
@@ -124,12 +125,7 @@ class _AddChildPage extends State<AddChildPage> {
                       textAlign: TextAlign.start,
                       ),
                       ),
-                    SizedBox(height: 16.0),
-                    buildInputLabel("Parent Phone"),
-                    buildInputField(
-                      controller: inputController.phoneNumberController,
-                        validator: parentController.validatePhoneNumber
-                    ),
+
                     SizedBox(height: 16.0),
                     buildInputLabel("Shuttle Code"),
                     buildInputField(
@@ -158,13 +154,21 @@ class _AddChildPage extends State<AddChildPage> {
                     SizedBox(height: 16.0),
                     buildElevatedButton(
                       onPressed: () async {
-                        if (await parentController.addChild(
-                            inputController, selectedSchool,_formKey.currentState!)) {
-                          print("SUCCESS!");
-                        } else {
-                          print("Error");
+                        bool registrationSuccess=false;
+                        registrationSuccess = await parentController.addChild(
+                            inputController, selectedSchool,_formKey.currentState!);
+                        if (!registrationSuccess) {
+                          // Registration failed, show dialog
+                          _showErrorDialog(
+                              "Adding Child is failed. Please try again.");
                         }
-                      },
+                        else{
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => ParentBase()),
+                          );
+                          print("SUCCESS!");
+                        }                       },
                       label: "Add Child",
                     ),
                   ],
@@ -267,6 +271,24 @@ class _AddChildPage extends State<AddChildPage> {
           child: Text(label, style: TextStyle(fontSize: 16)),
         ),
       ),
+    );
+  }
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) =>
+          AlertDialog(
+            title: Text('Error'),
+            content: Text(message),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+              ),
+            ],
+          ),
     );
   }
 }

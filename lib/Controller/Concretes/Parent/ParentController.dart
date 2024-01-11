@@ -137,9 +137,9 @@ class ParentController extends AbstractController {
                 isEqualTo: inputController.shuttleCodeController.text)
             .get();
         if (myFirebase.querySnapshot.docs.isEmpty) {
+          print("SES2!");
           return false;
         }
-
         children.name = inputController.nameController.text;
         children.surname = inputController.surnameController.text;
         children.shuttleKey = inputController.shuttleCodeController.text;
@@ -147,20 +147,43 @@ class ParentController extends AbstractController {
         children.phoneNumber = parent.phoneNumber;
         children.birthDate = inputController.birthDateController.text;
         children.key = children.hashTcID(inputController.birthDateController.text);
+
+        if(await checkChildExist(children.hashTcID(inputController.birthDateController.text))){
+          print("SES!");
+          return false;
+        }
+
         parent.childList.add(children.key);
 
         addChildToDB(inputController, selectedSchool);
         addChildToParentDB();
         addChildToShuttleDB();
         addChildToHostessDB();
+
       } catch (e) {
-        print("Error: $e");
+        print("Error2: $e");
         return false;
       }
 
       return true;
     }
     return false;
+  }
+
+  Future<bool> checkChildExist(String key) async{
+    try{
+      myFirebase.querySnapshot = await FirebaseFirestore.instance.collection('Children')
+          .where('key', isEqualTo: key).get();
+      if(myFirebase.querySnapshot.docs.isEmpty){
+        return false;
+      }
+    }catch (e) {
+      print("Error1: $e");
+      return false;
+    }
+
+
+    return true;
   }
 
   Future<void> addChildToDB(
