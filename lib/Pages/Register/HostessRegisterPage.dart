@@ -20,8 +20,6 @@ class HostessRegisterState extends State<HostessRegister> {
   String? _surnameError;
   String? _phoneNumberError;
   String? _shuttleCodeError;
-  String? _passwordError;
-  String? _confirmPasswordError;
 
   @override
   Widget build(BuildContext context) {

@@ -54,7 +54,7 @@ class ParentController extends AbstractController {
         parent.name = data['name'];
         parent.password = data['password'];
         parent.phoneNumber = data['phoneNumber'];
-        parent.childList = data['childList'];
+        parent.childList = data['child_list'];
       }
 
       return myFirebase.querySnapshot.docs.isNotEmpty;
@@ -96,7 +96,7 @@ class ParentController extends AbstractController {
           'surname': parent.surname,
           'phoneNumber': parent.phoneNumber,
           'password': parent.password,
-          'childList': parent.childList,
+          'child_list': parent.childList,
         });
       }
       else
@@ -133,7 +133,7 @@ class ParentController extends AbstractController {
       try {
         myFirebase.querySnapshot = await FirebaseFirestore.instance
             .collection('Shuttle')
-            .where('shuttleKey',
+            .where('shuttle_code',
                 isEqualTo: inputController.shuttleCodeController.text)
             .get();
         if (myFirebase.querySnapshot.docs.isEmpty) {
@@ -146,8 +146,7 @@ class ParentController extends AbstractController {
         children.school.school_name = selectedSchool;
         children.phoneNumber = parent.phoneNumber;
         children.birthDate = inputController.birthDateController.text;
-        children.key =
-            children.hashTcID(inputController.birthDateController.text);
+        children.key = children.hashTcID(inputController.birthDateController.text);
         parent.childList.add(children.key);
 
         addChildToDB(inputController, selectedSchool);
@@ -174,6 +173,7 @@ class ParentController extends AbstractController {
       'parent_phone_number': parent.phoneNumber,
       'birthDate': inputController.birthDateController.text,
       'key': children.key,
+      'state': "EVDE",
     });
   }
 
@@ -186,20 +186,20 @@ class ParentController extends AbstractController {
     var docID = myFirebase.querySnapshot.docs.first.id;
 
     await FirebaseFirestore.instance.collection('Hostess').doc(docID).update({
-      'childList': FieldValue.arrayUnion([children.key])
+      'child_list': FieldValue.arrayUnion([children.key])
     });
   }
 
   Future<void> addChildToShuttleDB() async {
     myFirebase.querySnapshot = await FirebaseFirestore.instance
         .collection('Shuttle')
-        .where('shuttleKey', isEqualTo: children.shuttleKey)
+        .where('shuttle_code', isEqualTo: children.shuttleKey)
         .get();
 
     var docID = myFirebase.querySnapshot.docs.first.id;
 
     await FirebaseFirestore.instance.collection('Shuttle').doc(docID).update({
-      'childList': FieldValue.arrayUnion([children.key])
+      'child_list': FieldValue.arrayUnion([children.key])
     });
   }
 
@@ -212,7 +212,7 @@ class ParentController extends AbstractController {
     var docID = myFirebase.querySnapshot.docs.first.id;
 
     await FirebaseFirestore.instance.collection('Parents').doc(docID).update({
-      'childList': FieldValue.arrayUnion([children.key])
+      'child_list': FieldValue.arrayUnion([children.key])
     });
   }
 
@@ -240,6 +240,7 @@ class ParentController extends AbstractController {
           child.shuttleKey = data['shuttleKey'];
           child.school.school_name = data['schoolName'];
           child.phoneNumber = data['parentPhoneNumber'];
+
 
           childrenList.add(child);
         }

@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_dev/Controller/Concretes/Input/InputController.dart';
 import 'package:mobile_dev/Controller/Concretes/Parent/ParentController.dart';
-import 'package:mobile_dev/Entities/Concretes/Parent.dart';
-import 'package:mobile_dev/Pages/Home/HomePage.dart';
 import 'package:mobile_dev/Pages/Parent/ParentBase.dart';
-
+import 'package:mobile_dev/Pages/Select/LogInSelect.dart';
 import '../../Controller/Abstract/AbstractController.dart';
-import '../Select/login_select.dart';
-
-//import '../hostess/hostess_base.dart';
 
 class LogInParent extends StatefulWidget {
   @override
