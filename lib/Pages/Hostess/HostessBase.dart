@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_dev/Pages/Home/HomePage.dart';
+import 'package:mobile_dev/Pages/Hostess/hostessProfil.dart';
 import 'package:mobile_dev/Pages/hostess/CheckChild.dart';
+import 'package:mobile_dev/Pages/Parent/ParentBase.dart'; // Profil sayfasını ekledim
 
 class start_cruise_page extends StatefulWidget {
   @override
@@ -127,6 +129,7 @@ class _start_cruise_pageState extends State<start_cruise_page> {
                   ),
                 ),
               ),
+
               // LOGO HEADER
               Positioned(
                 top: MediaQuery.of(context).size.height * 0.05,
@@ -138,7 +141,22 @@ class _start_cruise_pageState extends State<start_cruise_page> {
                     height: MediaQuery.of(context).size.height * 0.2,
                   ),
                 ),
-              )
+              ),
+
+              // Profile Button
+              Positioned(
+                top: 10,
+                right: 10,
+                child: IconButton(
+                  icon: Icon(Icons.settings),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => hostessProfilePage()),
+                    );
+                  },
+                ),
+              ),
             ],
           ),
         ),

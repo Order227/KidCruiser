@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_dev/DAOServices/MyFirebase.dart';
+import 'package:mobile_dev/Pages/Hostess/CheckChild.dart';
+import 'package:mobile_dev/Pages/Hostess/HostessBase.dart';
 import 'package:mobile_dev/Pages/Parent/ChildrenProvider.dart';
+import 'package:mobile_dev/Pages/Parent/ParentBase.dart';
+import 'package:mobile_dev/Pages/Parent/parentProfile.dart';
 import 'package:provider/provider.dart';
 import 'Pages/Home/HomePage.dart';
 
@@ -15,7 +19,7 @@ class MyApp extends StatelessWidget  {
   Widget build(BuildContext context) {
     return MaterialApp(
 
-      home:homePage(),
+      home:start_cruise_page(),
     );
   }
 }
