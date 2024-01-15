@@ -8,6 +8,8 @@ import 'package:mobile_dev/Entities/Concretes/School.dart';
 class Children extends AbstractUser{
   School _school=School();
   String? _shuttleKey;
+  String? _hostessName;
+  String? _hostessSurName;
   late String _key;
   String? _birthDate;
   String? _state;
@@ -19,6 +21,7 @@ class Children extends AbstractUser{
     String? surname,
     String? phoneNumber,
     String? password,
+    String? hostessName,
     String? shuttleKey,
     String? birthDate,
     String? state,
@@ -28,6 +31,7 @@ class Children extends AbstractUser{
     this.name = name;
     this.surname = surname;
     super.phoneNumber = phoneNumber;
+    this._hostessName = hostessName;
     this.password = password;
     this.shuttleKey = shuttleKey;
     this.birthDate = birthDate;
@@ -48,6 +52,22 @@ class Children extends AbstractUser{
     return digest.toString();            // Hash'i String Olarak Döndür
   }
 
+  String? get hostessSurName{
+    return this._hostessSurName;
+  }
+
+  set hostessSurName(String? value) {
+    _hostessSurName = value;
+  }
+
+
+  String? get hostessName{
+    return this._hostessName;
+  }
+
+  set hostessName(String? value) {
+    _hostessName = value;
+  }
 
   String? get birthDate{
     return this._birthDate;
@@ -81,4 +101,11 @@ class Children extends AbstractUser{
     this._shuttleKey=shuttleKey;
   }
 
+  String? get parentPhoneNumber{
+    return this._parentPhoneNumber;
+  }
+
+  set parentPhoneNumber(String? value) {
+    _parentPhoneNumber = value;
+  }
 }

@@ -263,8 +263,8 @@ class ParentController extends AbstractController {
           child.shuttleKey = data['shuttleKey'];
           child.school.school_name = data['schoolName'];
           child.phoneNumber = data['parentPhoneNumber'];
-
-
+          child.hostessName = await getHostessName(element);
+          child.hostessSurName = await getHostessSurName(element);
           childrenList.add(child);
         }
       }
@@ -272,4 +272,57 @@ class ParentController extends AbstractController {
 
     return childrenList;
   }
+
+  Future<String?> getHostessName(String key) async {
+    // Replace 'key' with the actual field name in your Firestore document
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore.instance
+        .collection('Children')
+        .where('key', isEqualTo: key)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+
+      String? shuttleKey = querySnapshot.docs.first['shuttleKey'];
+
+      if (shuttleKey != null) {
+        querySnapshot = await FirebaseFirestore.instance
+            .collection('Hostess')
+            .where('shuttle_code', isEqualTo: shuttleKey)
+            .get();
+        if (querySnapshot.docs.isNotEmpty) {
+          String? hostessName = querySnapshot.docs.first['name'];
+          return hostessName;
+        }
+      }
+    }
+
+    return null; // Return null if the document or field is not found
+  }
+
+  Future<String?> getHostessSurName(String key) async {
+    // Replace 'key' with the actual field name in your Firestore document
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore.instance
+        .collection('Children')
+        .where('key', isEqualTo: key)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+
+      String? shuttleKey = querySnapshot.docs.first['shuttleKey'];
+
+      if (shuttleKey != null) {
+        querySnapshot = await FirebaseFirestore.instance
+            .collection('Hostess')
+            .where('shuttle_code', isEqualTo: shuttleKey)
+            .get();
+        if (querySnapshot.docs.isNotEmpty) {
+          String? hostessSurName = querySnapshot.docs.first['surname'];
+          return hostessSurName;
+        }
+      }
+    }
+
+    return null; // Return null if the document or field is not found
+  }
 }
+
