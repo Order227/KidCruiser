@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_dev/Controller/Concretes/Hostess/HostessController.dart';
-import 'package:mobile_dev/Pages/Home/HomePage.dart';
 import 'package:mobile_dev/Pages/Select/LogInSelect.dart';
 
+import '../../Controller/Abstract/AbstractController.dart';
 import '../../Controller/Concretes/Input/InputController.dart';
-import '../../Controller/Concretes/Parent/ParentController.dart';
-import '../hostess/HostessBase.dart';
 import '../hostess/HostessBase.dart';
 
 class LogInHostess extends StatefulWidget {
@@ -78,16 +76,72 @@ class _hostes_loginState extends State<LogInHostess> {
                   top: (topofbutton / 0.45) * 0.66,
                   left: lefofbutton * 3,
                   child: ElevatedButton(
-                    onPressed: () async {
-                      if (await hostessController.logIn(
-                          inputController, _formKey.currentState!)) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => start_cruise_page()),
-                        );
-                      }
-                    },
+                      onPressed: () async {
+                        var result = await hostessController.logIn(inputController, _formKey.currentState!);
+
+                        if (result == LoginResult.success) {
+                          // Navigate to the next page
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => start_cruise_page()),
+                          );
+                        } else if (result == LoginResult.phoneNumberNotExist) {
+                          // Show an error message for non-existent phone number
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title:Text(
+                                  "ERROR!",
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600,
+                                    // Replace with your desired color
+                                  ),
+                                ),
+                                content: Text("Phone number does not exist.",style: TextStyle(fontSize: 15),),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: Text("Close"),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        } else {
+                          // Handle other errors
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text(
+                                  "ERROR!",
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600,
+                                    // Replace with your desired color
+                                  ),
+                                ),
+                                content: Text("Invalid phone number or password!",style: TextStyle(fontSize: 15),),
+                                actions: <Widget>[
+                              TextButton(
+                              child: Text("Close"),
+                              onPressed: () {
+                              Navigator.of(context).pop();
+                              },
+                              ),
+
+                                ],
+                              );
+                            },
+                          );
+                        }
+                      },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       shape: RoundedRectangleBorder(
@@ -155,11 +209,12 @@ class _hostes_loginState extends State<LogInHostess> {
                                     inputController.phoneNumberController,
                                 validator:
                                     hostessController.validatePhoneNumber,
+
+
                                 //controller: inputController.phoneNumberController,
                                 keyboardType: TextInputType.datetime,
                                 decoration: InputDecoration(
-                                  border:
-                                      OutlineInputBorder(), // Add an outline border
+                                  enabledBorder: InputBorder.none, // Add an outline border
                                   hintText: '0-(5xx)-xxx-xxxx',
                                 ),
                               ),
@@ -198,8 +253,14 @@ class _hostes_loginState extends State<LogInHostess> {
                                 obscureText: _isObscured,
                                 controller: inputController.passwordController,
                                 validator: hostessController.validatePassword,
+
                                 decoration: InputDecoration(
-                                    border: OutlineInputBorder(),
+                                    enabledBorder: InputBorder.none,
+                                    errorStyle: TextStyle( // Adjust the style of error text
+                                      fontSize: 10, // Smaller font size
+                                      height: 0.7, // Tighter line height
+                                    ),
+                                    errorMaxLines: 3,
                                     // labelText: "Enter Password",
                                     //helperText: "Password must be at least 8 characters and include \nan uppercase letter, a lowercase letter, and a digit.",
                                     suffixIcon: IconButton(
@@ -276,3 +337,5 @@ class _hostes_loginState extends State<LogInHostess> {
     );
   }
 }
+
+

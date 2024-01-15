@@ -6,7 +6,14 @@ import 'package:mobile_dev/Pages/Parent/AddChildPage.dart';
 void main() {
   runApp(ParentBase());
 }
-
+class CustomBackButtonDispatcher extends RootBackButtonDispatcher {
+  @override
+  Future<bool> didPopRoute() {
+    // Implement your custom back button logic here
+    // Return true if the pop operation should be allowed, false otherwise
+    return Future.value(false);
+  }
+}
 class ParentBase extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -19,8 +26,11 @@ class ParentBase extends StatelessWidget {
     double betweenbutton = screenSize.width * 0.1;
 
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
+        debugShowCheckedModeBanner: false,
+
+        home: PopScope(
+        canPop: false,
+      child: Scaffold(
         body: SafeArea(
           child: Container(
             width: MediaQuery.of(context).size.width,
@@ -179,7 +189,7 @@ class ParentBase extends StatelessWidget {
                       height: heightbutton / 1.5,
                       alignment: Alignment.center,
                       child: Text(
-                        'Go Back',
+                        'Log Out',
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 20,
@@ -214,6 +224,7 @@ class ParentBase extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }

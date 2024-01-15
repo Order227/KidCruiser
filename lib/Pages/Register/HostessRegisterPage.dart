@@ -4,11 +4,13 @@ import 'package:mobile_dev/Controller/Concretes/Input/InputController.dart';
 import 'package:mobile_dev/Pages/LogIn/HostessLoginPage.dart';
 
 class HostessRegister extends StatefulWidget {
+  const HostessRegister({super.key});
+
   @override
-  _HostessRegisterState createState() => _HostessRegisterState();
+  HostessRegisterState createState() => HostessRegisterState();
 }
 
-class _HostessRegisterState extends State<HostessRegister> {
+class HostessRegisterState extends State<HostessRegister> {
   bool _isObscured = true;
   bool _isObscured_ = true;
   HostessController hostessRegisterController = HostessController();
@@ -18,8 +20,6 @@ class _HostessRegisterState extends State<HostessRegister> {
   String? _surnameError;
   String? _phoneNumberError;
   String? _shuttleCodeError;
-  String? _passwordError;
-  String? _confirmPasswordError;
 
   @override
   Widget build(BuildContext context) {
@@ -166,8 +166,13 @@ class _HostessRegisterState extends State<HostessRegister> {
                                     hostessRegisterController.validatePassword,
                                     decoration: InputDecoration(
                                         enabledBorder: InputBorder.none,
-                                        contentPadding:
-                                        EdgeInsets.only(left: 20.0, top: 20.0),
+                                        errorStyle: TextStyle( // Adjust the style of error text
+                                          fontSize: 10, // Smaller font size
+                                          height: 0.7, // Tighter line height
+                                        ),
+                                        errorMaxLines: 3,
+                                       // contentPadding:
+                                       // EdgeInsets.only(left: 20.0, top: 20.0),
                                         suffixIcon: IconButton(
                                           icon: Icon(
                                             _isObscured
@@ -226,8 +231,11 @@ class _HostessRegisterState extends State<HostessRegister> {
                                     },
                                     decoration: InputDecoration(
                                         enabledBorder: InputBorder.none,
-                                        contentPadding:
-                                        EdgeInsets.only(left: 20.0, top: 20.0),
+                                        errorStyle: TextStyle( // Adjust the style of error text
+                                          fontSize: 10, // Smaller font size
+                                          height: 0.7, // Tighter line height
+                                        ),
+                                        errorMaxLines: 3,
                                         suffixIcon: IconButton(
                                           icon: Icon(
                                             _isObscured_
@@ -253,36 +261,34 @@ class _HostessRegisterState extends State<HostessRegister> {
                               child: ElevatedButton(
                                 onPressed: () async {
                                   if (_formKey.currentState?.validate() ?? false) {
-                                    if (await hostessRegisterController.register(
-                                        inputController, _formKey.currentState!)) {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => LogInHostess(),
-                                        ),
-                                      );
+                                    // Synchronous validation passed
+                                    String? existenceError = await hostessRegisterController.checkUserExistence(
+                                        inputController.phoneNumberController.text);
+                                   // print(existenceError);
+                                    if (existenceError == null) {
+                                     // print("object");
+                                      // No existing user, try to register
+                                      bool registrationSuccess = await hostessRegisterController
+                                          .register(
+                                          inputController, _formKey.currentState!);
+
+                                      if (!registrationSuccess) {
+                                        // Registration failed, show dialog
+                                        _showErrorDialog(
+                                            "Registration failed. Please try again.");
+                                      } else if(registrationSuccess){
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => LogInHostess(),
+                                          ),
+                                        );
+                                        // Registration success, proceed further
+                                      }
+                                    } else {
+                                      // Existing user, show error dialog
+                                      _showErrorDialog(existenceError);
                                     }
-                                  } else {
-                                    setState(() {
-                                      _nameError = hostessRegisterController
-                                          .validateName(
-                                          inputController.nameController.text);
-                                      _surnameError = hostessRegisterController
-                                          .validateSurname(
-                                          inputController.surnameController.text);
-                                      _phoneNumberError =
-                                          hostessRegisterController.validatePhoneNumber(
-                                              inputController.phoneNumberController.text);
-                                      _shuttleCodeError = hostessRegisterController
-                                          .validateShuttleKey(
-                                          inputController.shuttleCodeController.text);
-                                      _passwordError = hostessRegisterController
-                                          .validatePassword(
-                                          inputController.passwordController.text);
-                                      _confirmPasswordError = hostessRegisterController
-                                          .validatePassword(
-                                          inputController.confirmpasswordController.text);
-                                    });
                                   }
                                 },
                                 child: Text("Register"),
@@ -350,6 +356,25 @@ class _HostessRegisterState extends State<HostessRegister> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) =>
+          AlertDialog(
+            title: Text('Error'),
+            content: Text(message),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+              ),
+            ],
+          ),
     );
   }
 }

@@ -6,37 +6,46 @@ import 'package:mobile_dev/DAOServices/MyFirebase.dart';
 import 'package:mobile_dev/Entities/Concretes/Children.dart';
 import 'package:mobile_dev/Entities/Concretes/Hostess.dart';
 
+
+
+
+
 class HostessController extends AbstractController{
 
   static Hostess hostess = Hostess();
   MyFirebase myFirebase=MyFirebase();
 
-  Future<bool> logIn(InputController inputController, FormState formState) async {
-
-    if(formState.validate()){
-      var phoneNumber = inputController.phoneNumberController.text;
-      var password = inputController.passwordController.text;
-
-      if (await checkExistForLogIn(phoneNumber, password)) {
-        return true;
-      } else {
-        super.errorMessage = "Invalid phone number or password!";
-      }
-      return false;
+  Future<LoginResult> logIn(InputController inputController, FormState formState) async {
+    if (!formState.validate()) {
+      return LoginResult.error;
     }
-    return false;
+
+    var phoneNumber = inputController.phoneNumberController.text;
+    var password = inputController.passwordController.text;
+
+    try {
+      bool exists = await checkExistForLogIn(phoneNumber, password);
+      if (exists) {
+        return LoginResult.success;
+      } else {
+        return LoginResult.phoneNumberNotExist;
+      }
+    } catch (e) {
+      //print("Error: $e");
+      return LoginResult.error;
+    }
   }
 
   Future<bool> checkExistForLogIn(String phoneNumber, String password) async {
     try {
-        print("phoneNumber: "+phoneNumber);
-          myFirebase.querySnapshot = await FirebaseFirestore.instance
+      myFirebase.querySnapshot = await FirebaseFirestore.instance
           .collection('Hostess')
           .where('phoneNumber', isEqualTo: phoneNumber)
           .where('password', isEqualTo: password)
           .get();
 
       if (myFirebase.querySnapshot.docs.isNotEmpty) {
+        print("BURDAYIM!!!");
         Map<String, dynamic> data = myFirebase.querySnapshot.docs
             .elementAt(0)
             .data() as Map<String, dynamic>;
@@ -47,6 +56,7 @@ class HostessController extends AbstractController{
         hostess.password = data['password'];
         hostess.phoneNumber = data['phoneNumber'];
         hostess.students = data['child_list'];
+        print("NABERRER1");
       }
 
       return myFirebase.querySnapshot.docs.isNotEmpty;
@@ -56,6 +66,20 @@ class HostessController extends AbstractController{
     }
   }
 
+
+  Future<String?> checkUserExistence(String phoneNumber) async {
+    try {
+      var exists = await checkExistForRegister(phoneNumber);
+      // print(exists);
+      if (!exists) {
+        // User already exists
+        return "This phone number is already in use.";
+      }
+      return null; // User does not exist, return null
+    } catch (e) {
+      return "An error occurred during registration.";
+    }
+  }
 
 
   Future<bool> register(InputController inputController, FormState formState) async {
@@ -71,7 +95,7 @@ class HostessController extends AbstractController{
         hostess.shuttleKey = inputController.shuttleCodeController.text;
 
         myFirebase.querySnapshot = await FirebaseFirestore.instance.collection('Shuttle')
-        .where('shuttle_code', isEqualTo: hostess.shuttleKey).get();
+            .where('shuttle_code', isEqualTo: hostess.shuttleKey).get();
 
         var doc= myFirebase.querySnapshot.docs.first as dynamic;
 
