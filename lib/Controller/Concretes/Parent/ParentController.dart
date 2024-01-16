@@ -208,7 +208,7 @@ class ParentController extends AbstractController {
   Future<void> addChildToHostessDB() async {
     myFirebase.querySnapshot = await FirebaseFirestore.instance
         .collection('Hostess')
-        .where('shuttleKey', isEqualTo: children.shuttleKey)
+        .where('shuttle_code', isEqualTo: children.shuttleKey)
         .get();
 
     var docID = myFirebase.querySnapshot.docs.first.id;

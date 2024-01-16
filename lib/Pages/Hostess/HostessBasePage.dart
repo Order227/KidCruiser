@@ -4,12 +4,12 @@ import 'package:mobile_dev/Pages/Hostess/HostessProfilePage.dart';
 import 'package:mobile_dev/Pages/hostess/CheckChild.dart';
 
 
-class start_cruise_page extends StatefulWidget {
+class HostessBasePage extends StatefulWidget {
   @override
-  _start_cruise_pageState createState() => _start_cruise_pageState();
+  HostessBasePageState createState() => HostessBasePageState();
 }
 
-class _start_cruise_pageState extends State<start_cruise_page> {
+class HostessBasePageState extends State<HostessBasePage> {
   TextEditingController idController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 

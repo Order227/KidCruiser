@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_dev/Controller/Concretes/Hostess/HostessController.dart';
+import 'package:mobile_dev/Pages/Hostess/HostessBasePage.dart';
 
 import 'package:mobile_dev/Pages/Parent/ChangePasswordPage.dart';
 import 'package:mobile_dev/Pages/Parent/ParentBase.dart';
@@ -148,7 +149,7 @@ class HostessProfilePage extends StatelessWidget {
             onPressed: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => ParentBase()),
+                MaterialPageRoute(builder: (context) => HostessBasePage()),
               );
             },
           ),
