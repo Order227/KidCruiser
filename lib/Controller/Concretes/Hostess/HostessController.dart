@@ -13,6 +13,7 @@ import 'package:mobile_dev/Entities/Concretes/Hostess.dart';
 class HostessController extends AbstractController{
 
   static Hostess hostess = Hostess();
+  Hostess hostess_ = hostess;
   MyFirebase myFirebase=MyFirebase();
 
   Future<LoginResult> logIn(InputController inputController, FormState formState) async {

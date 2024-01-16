@@ -12,7 +12,12 @@ import 'package:flutter/cupertino.dart';
 class ParentController extends AbstractController {
   MyFirebase myFirebase = MyFirebase();
   static Parent parent = Parent();
+  Parent parent_ = parent; // Since static field cannot be accessed from another page, i need to create
+  // a non-static Parent object that copy of static Parent object;
   Children children = Children();
+
+
+
 
   Future<LoginResult> logIn(InputController inputController, FormState formState) async {
     if (!formState.validate()) {
@@ -324,5 +329,7 @@ class ParentController extends AbstractController {
 
     return null; // Return null if the document or field is not found
   }
+
+
 }
 
