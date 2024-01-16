@@ -14,7 +14,12 @@ class homePage extends StatelessWidget {
     double widthbutton = screenSize.width * 0.25;
     double heightbutton = screenSize.height * 0.1;
     double betweenbutton = screenSize.width * 0.1;
-    return  Scaffold(
+    return WillPopScope(
+        onWillPop: () async {
+          return false;
+        },
+
+    child:  Scaffold(
         body: SafeArea(
           child: Container(
             width: MediaQuery.of(context).size.width,
@@ -155,7 +160,7 @@ class homePage extends StatelessWidget {
             ),
           ),
         ),
-      );
-
+      ),
+    );
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_dev/Controller/Concretes/Parent/ParentController.dart';
 import 'package:mobile_dev/Controller/Concretes/Input/InputController.dart';
 import 'package:mobile_dev/Pages/LogIn/ParentLoginPage.dart';
+import 'package:mobile_dev/Pages/Select/RegisterSelect.dart';
 
 class ParentRegister extends StatefulWidget {
   @override
@@ -36,7 +37,16 @@ class _ParentRegisterState extends State<ParentRegister> {
         .size
         .height;
 
-    return MaterialApp(
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => RegisterSelect()),
+        );
+        return false;
+      },
+
+    child: MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.red,
@@ -341,6 +351,7 @@ class _ParentRegisterState extends State<ParentRegister> {
           ],
         ),
       ),
+    ),
     );
   }
 
