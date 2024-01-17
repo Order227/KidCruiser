@@ -121,7 +121,24 @@ class HostessController extends AbstractController{
     }
     return false;
   }
+  Future<String?> checkShuttleKeyExistence(String shuttleKey) async {
+    try {
+      // Query Firestore for the shuttle key
+      var querySnapshot = await FirebaseFirestore.instance.collection('Shuttle')
+          .where('shuttle_code', isEqualTo: shuttleKey)
+          .get();
 
+      // Check if any documents are returned
+      if (querySnapshot.docs.isNotEmpty) {
+        return null ; // Shuttle key exists
+      } else {
+        return "Entered shuttle key is not valid."; // Shuttle key does not exist
+      }
+    } catch (e) {
+    //  print('Error checking shuttle key existence: $e');
+      return 'Error checking shuttle key existence: $e'; // Return false in case of any error
+    }
+  }
   Future<bool> checkExistForRegister(String phoneNumber) async {
     try {
       myFirebase.querySnapshot = await FirebaseFirestore.instance

@@ -1,10 +1,20 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:mobile_dev/Controller/Concretes/Input/InputController.dart';
 import 'package:mobile_dev/Controller/Concretes/Parent/ParentController.dart';
+import 'package:mobile_dev/Pages/Parent/ParentBase.dart';
 
-class ChangePhoneNumberPage extends StatelessWidget {
+class ChangePhoneNumberPage extends StatefulWidget {
+  @override
+  _ChangePhoneNumberPage createState() => _ChangePhoneNumberPage();
+}
+
+class _ChangePhoneNumberPage extends State<ChangePhoneNumberPage> {
   ParentController parentController = ParentController();
   InputController inputController = InputController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _showVerificationCodeInput = false;
 
   @override
   Widget build(BuildContext context) {
@@ -41,53 +51,98 @@ class ChangePhoneNumberPage extends StatelessWidget {
               builder: (BuildContext context) {
                 return SingleChildScrollView(
                   padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Center(
-                        child: Text(
-                          "Change Phone Number",
-                          style: TextStyle(
-                            fontSize: 24.0,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Text(
+                            "Change Phone Number",
+                            style: TextStyle(
+                              fontSize: 24.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: 16.0),
-                      buildInputLabel("Enter New Phone Number"),
-                      buildInputField(
-                        context: context,
-                        controller:
-                        inputController.phoneNumberController,
-                        validator: parentController.validatePhoneNumber,
-                      ),
-                      SizedBox(height: 16.0),
-                      buildInputLabel("Confirm New Phone Number"),
-                      buildInputField(
-                        context: context,
-                        controller:
-                        inputController.phoneNumberController,
-                        validator: parentController.validatePhoneNumber,
-                      ),
-                      SizedBox(height: 16.0),
-                      buildInputLabel("Enter Old Phone Number"),
-                      buildInputField(
-                        context: context,
-                        controller:
-                        inputController.phoneNumberController,
-                        validator: parentController.validatePhoneNumber,
-                      ),
-                      SizedBox(height: 32.0),
-                      buildElevatedButton(
-                        context: context,
-                        onPressed: () async {
+                        SizedBox(height: 16.0),
+                        buildInputLabel("Enter Current PhoneNumber"),
+                        buildInputField(
+                          context: context,
+                          controller:
+                          inputController.phoneNumberController,
+                          validator: parentController.validatePhoneNumber,
+                        ),
 
-                        },
-                        label: "Change Phone Number",
-                      ),
-                    ],
+                        SizedBox(height: 16.0),
+                        buildInputLabel("Enter New PhoneNumber"),
+                        buildInputField(
+                          context: context,
+                          controller:
+                          inputController.changephonenumber,
+                          validator: parentController.validatePhoneNumber,
+                        ),
+                        SizedBox(height: 32.0),
+                        Center(
+
+                          child: ElevatedButton(
+
+                            onPressed: () async {
+                              if (_formKey.currentState?.validate() ??
+                                  false) {
+                                // Synchronous validation passed
+                                String? existenceError = await parentController
+                                    .checkExistPhone(
+                                    inputController.phoneNumberController
+                                        .text);
+                                print(existenceError);
+                                if (existenceError == null) {
+                                  print("object");
+                                  // No existing user, try to register
+                                  String? phoennumbercheck = await parentController
+                                      .checkExistPhone(
+                                      inputController.changephonenumber
+                                          .text);
+                                    print(phoennumbercheck);
+                                  if (phoennumbercheck==null) {
+                                    // Registration failed, show dialog
+                                    _showErrorDialog(
+                                        context,"New PhoneNumber is exist already");
+                                  } else if (phoennumbercheck!=null) {
+                                    // print("HAMZAAAA");
+
+                                      _showVerificationCodeInput = true;
+
+
+                                    // Trigger AlertDialog for verification code input
+                                    if (_showVerificationCodeInput) {
+                                      Future.delayed(Duration.zero, () =>
+                                          _showVerificationCodeDialog(
+                                              context));
+                                    }
+                                    /*
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => LogInParent(),
+                                      ),
+                                    );*/
+                                    // Registration success, proceed further
+                                  }
+                                } else {
+                                  // Existing user, show error dialog
+                                  _showErrorDialog(context,existenceError!);
+                                }
+                              }
+                            },
+                            child: Text("Change"),
+                          ),
+
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
@@ -96,6 +151,8 @@ class ChangePhoneNumberPage extends StatelessWidget {
         ],
       ),
     );
+
+
   }
 
   Widget buildInputLabel(String label) {
@@ -158,4 +215,72 @@ class ChangePhoneNumberPage extends StatelessWidget {
       ),
     );
   }
+
+
+  void _showErrorDialog(BuildContext context,String message) {
+    showDialog(
+      context: context,
+      builder: (context) =>
+          AlertDialog(
+            title: Text('Error'),
+            content: Text(message),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+              ),
+            ],
+          ),
+    );
+  }
+
+  void _showVerificationCodeDialog(BuildContext context) {
+    TextEditingController _verificationCodeController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Enter Verification Code"),
+          content: TextField(
+            controller: _verificationCodeController,
+            decoration: InputDecoration(
+              labelText: "Verification Code",
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: Text('Submit'),
+              onPressed: () {
+                // Add your logic to handle verification code submission
+                String enteredCode = _verificationCodeController.text;
+                if (enteredCode.isEmpty) {
+                  // Handle empty code case, maybe show an error
+                } else {
+                  // Proceed with the verification logic
+                  Navigator.of(context).pop(); // Close the dialog after submission
+
+                  // Optionally navigate or perform other actions
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ParentBase(),
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 }

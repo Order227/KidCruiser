@@ -132,6 +132,43 @@ class ParentController extends AbstractController {
     }
   }
 
+  Future<String ?> checkExistPhone(String phoneNumber) async {
+    try {
+      myFirebase.querySnapshot = await FirebaseFirestore.instance
+          .collection('Parents')
+          .where('phoneNumber', isEqualTo: phoneNumber)
+          .get();
+
+      if (myFirebase.querySnapshot.docs.isNotEmpty) {
+        return null;
+      }
+
+      return "Phone number doesn't exist";
+    } catch (e) {
+     // print("Error: $e");
+      return "ERROR";
+    }
+  }
+
+
+  Future<String ?> checkExistPassword(String password) async {
+    try {
+      myFirebase.querySnapshot = await FirebaseFirestore.instance
+          .collection('Parents')
+          .where('password', isEqualTo: password)
+          .get();
+
+      if (myFirebase.querySnapshot.docs.isNotEmpty) {
+        return null;
+      }
+
+      return "Incorrect Password!";
+    } catch (e) {
+      // print("Error: $e");
+      return "ERROR";
+    }
+  }
+
   Future<bool> addChild(InputController inputController, String? selectedSchool,
       FormState formState) async {
     if (formState.validate()) {

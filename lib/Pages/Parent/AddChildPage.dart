@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:mobile_dev/Controller/Concretes/Input/InputController.dart';
 import 'package:mobile_dev/Controller/Concretes/Parent/ParentController.dart';
 import 'package:mobile_dev/Controller/Concretes/School/SchoolController.dart';
@@ -107,24 +108,42 @@ class _AddChildPage extends State<AddChildPage> {
                     ),
                     SizedBox(height: 16.0),
                     buildInputLabel("Birth Date"),
-                      Container(
-                      width: MediaQuery.of(context).size.width * 0.6, // Yatay uzunluğu buradan kontrol edebilirsiniz
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.6, // Control the width here
                       padding: EdgeInsets.symmetric(horizontal: 12.0),
                       decoration: ShapeDecoration(
-                      color: Colors.white.withOpacity(0.8),
-                      shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                        color: Colors.white.withOpacity(0.8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
+                      child: GestureDetector(
+                        onTap: () async {
+                          DateTime? pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(1900),
+                            lastDate: DateTime.now(),
+                          );
+                          if (pickedDate != null) {
+                            // Format and set the date in controller
+                            String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+                            inputController.birthDateController.text = formattedDate;
+                          }
+                        },
+                        child: AbsorbPointer( // Prevents keyboard from showing
+                          child: TextField(
+                            controller: inputController.birthDateController,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: "Enter Birth Date", // Placeholder
+                            ),
+                            textAlign: TextAlign.start,
+                          ),
+                        ),
                       ),
-                      child:
-                      TextField(
-                      controller: inputController.birthDateController,
-                      decoration: InputDecoration(
-                      border: InputBorder.none,
-                      ),
-                      textAlign: TextAlign.start,
-                      ),
-                      ),
+                    ),
+
 
                     SizedBox(height: 16.0),
                     buildInputLabel("Shuttle Code"),

@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:mobile_dev/Controller/Concretes/Input/InputController.dart';
 import 'package:mobile_dev/Controller/Concretes/Parent/ParentController.dart';
 
+import 'ParentBase.dart';
+
 class ChangePasswordPage extends StatelessWidget {
   ParentController parentController = ParentController();
   InputController inputController = InputController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _showVerificationCodeInput = false;
 
   @override
   Widget build(BuildContext context) {
@@ -36,61 +40,125 @@ class ChangePasswordPage extends StatelessWidget {
               ),
             ),
           ),
-          Center(
-            child: Builder(
-              builder: (BuildContext context) {
-                return SingleChildScrollView(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Center(
-                        child: Text(
-                          "Change Password",
-                          style: TextStyle(
-                            fontSize: 24.0,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
+          Form(
+            key: _formKey,
+            child: Center(
+              child: Builder(
+                builder: (BuildContext context) {
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Text(
+                            "Change Password",
+                            style: TextStyle(
+                              fontSize: 24.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: 16.0),
-                      buildInputLabel("Enter Old Password"),
-                      buildInputField(
-                        context: context,
-                        controller:
-                        inputController.passwordController,
-                        validator: parentController.validatePassword,
-                      ),
-                      SizedBox(height: 16.0),
-                      buildInputLabel("Enter New Password"),
-                      buildInputField(
-                        context: context,
-                        controller:
-                        inputController.passwordController,
-                        validator: parentController.validatePassword,
-                      ),
-                      SizedBox(height: 16.0),
-                      buildInputLabel("Confirm New Password"),
-                      buildInputField(
-                        context: context,
-                        controller:
-                        inputController.passwordController,
-                        validator: parentController.validatePassword,
-                      ),
-                      SizedBox(height: 32.0),
-                      buildElevatedButton(
-                        context: context,
-                        onPressed: () async {
+                        SizedBox(height: 16.0),
+                        buildInputLabel("Enter Current Password"),
+                        buildInputField(
+                          context: context,
+                          controller:
+                          inputController.passwordController,
+                          validator: parentController.validatePassword,
+                        ),
+                        SizedBox(height: 16.0),
+                        buildInputLabel("Enter New Password"),
+                        buildInputField(
+                          context: context,
+                          controller:
+                          inputController.newpasswordController,
+                          validator: parentController.validatePassword,
+                        ),
+                        SizedBox(height: 16.0),
+                        buildInputLabel("Confirm New Password"),
+                        buildInputField(
+                          context: context,
+                          controller: inputController.newpasswordControllerconfirm,
+                          validator: (value) {
+                            // First, check if the entered value meets your password criteria
+                            String? basicValidation = parentController.validatePassword(value);
+                            if (basicValidation != null) {
+                              // If basic validation fails, return the error message
+                              return basicValidation;
+                            }
+                            // Then, check if the new password and confirm new password match
+                            if (value != inputController.newpasswordController.text) {
+                              return 'Passwords do not match';
+                            }
+                            // If everything is fine, return null
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: 32.0),
+                        Center(
+            
+                          child: ElevatedButton(
+            
+                            onPressed: () async {
+                              if (_formKey.currentState?.validate() ??
+                                  false) {
+                                // Synchronous validation passed
+                                String? existenceError = await parentController
+                                    .checkExistPassword(
+                                    inputController.passwordController
+                                        .text);
+                                print(existenceError);
+                                if (existenceError == null) {
+                                  print("object");
+                                  // No existing user, try to register
+                                  String? phoennumbercheck = await parentController
+                                      .checkExistPassword(
+                                      inputController.newpasswordController
+                                          .text);
+                                  print(phoennumbercheck);
+                                  if (phoennumbercheck==null) {
+                                    // Registration failed, show dialog
+                                    _showErrorDialog(
+                                        context,"New password can not same as old one");
+                                  } else if (phoennumbercheck!=null) {
+                                    // print("HAMZAAAA");
 
-                        },
-                        label: "Change Phone Number",
-                      ),
-                    ],
-                  ),
-                );
-              },
+                                    _showVerificationCodeInput = true;
+
+
+                                    // Trigger AlertDialog for verification code input
+                                    if (_showVerificationCodeInput) {
+                                      Future.delayed(Duration.zero, () =>
+                                          changedPassword(
+                                              context));
+                                    }
+                                    /*
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => LogInParent(),
+                                        ),
+                                      );*/
+                                    // Registration success, proceed further
+                                  }
+                                } else {
+                                  // Existing user, show error dialog
+                                  _showErrorDialog(context,existenceError!);
+                                }
+                              }
+                            },
+                            child: Text("Change"),
+                          ),
+            
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             ),
           ),
         ],
@@ -158,4 +226,50 @@ class ChangePasswordPage extends StatelessWidget {
       ),
     );
   }
+
+
+  void _showErrorDialog(BuildContext context,String message) {
+    showDialog(
+      context: context,
+      builder: (context) =>
+          AlertDialog(
+            title: Text('Error'),
+            content: Text(message),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+              ),
+            ],
+          ),
+    );
+  }
+
+  void changedPassword(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) =>
+          AlertDialog(
+            title: Text('Completed'),
+            content: Text("Password has Changed"),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ParentBase(),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+    );
+  }
+
 }
