@@ -2,18 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:mobile_dev/Pages/LogIn/ParentLoginPage.dart';
 import 'package:mobile_dev/Pages/Parent/CheckChild.dart';
 import 'package:mobile_dev/Pages/Parent/AddChildPage.dart';
+import 'package:mobile_dev/Pages/Parent/ParentProfilePage.dart';
 
 void main() {
   runApp(ParentBase());
 }
-class CustomBackButtonDispatcher extends RootBackButtonDispatcher {
-  @override
-  Future<bool> didPopRoute() {
-    // Implement your custom back button logic here
-    // Return true if the pop operation should be allowed, false otherwise
-    return Future.value(false);
-  }
-}
+
 class ParentBase extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -25,12 +19,15 @@ class ParentBase extends StatelessWidget {
     double heightbutton = screenSize.height * 0.1;
     double betweenbutton = screenSize.width * 0.1;
 
-    return MaterialApp(
-        debugShowCheckedModeBanner: false,
+    return WillPopScope(
+        onWillPop: () async {
+          // Return false to disable the back button
+          return false;
+        },
 
-        home: PopScope(
-        canPop: false,
-      child: Scaffold(
+    child: MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
         body: SafeArea(
           child: Container(
             width: MediaQuery.of(context).size.width,
@@ -44,7 +41,7 @@ class ParentBase extends StatelessWidget {
                   Color(0xDBFFFBFB),
                   Color(0xF1C6B8C6),
                   Color(0xF3D8D6C2),
-                  Color(0xFFDBCFC4)
+                  Color(0xFFDBCFC4),
                 ],
               ),
               shape: RoundedRectangleBorder(
@@ -77,11 +74,9 @@ class ParentBase extends StatelessWidget {
                             );
                           },
                           style: ElevatedButton.styleFrom(
-                            primary: Color(
-                                0xFFFEFFEE), // Set the background color of the button
+                            primary: Color(0xFFFEFFEE),
                             shape: RoundedRectangleBorder(
-                              borderRadius:
-                              BorderRadius.circular(30.0), // Set the radius
+                              borderRadius: BorderRadius.circular(30.0),
                             ),
                             shadowColor: Color(0x3F000000),
                             elevation: 4,
@@ -95,17 +90,15 @@ class ParentBase extends StatelessWidget {
                                 children: [
                                   Icon(
                                     Icons.add,
-                                    color: Colors
-                                        .black, // Set your desired icon color
-                                    size: 50.0, // Set your desired icon size
+                                    color: Colors.black,
+                                    size: 50.0,
                                   ),
                                   SizedBox(height: 8.0),
                                   Text(
                                     "Add Child",
                                     style: TextStyle(
                                       color: Colors.black,
-                                      fontSize:
-                                      12.0, // Set your desired text size
+                                      fontSize: 12.0,
                                     ),
                                   ),
                                 ],
@@ -126,11 +119,9 @@ class ParentBase extends StatelessWidget {
                             );
                           },
                           style: ElevatedButton.styleFrom(
-                            primary: Color(
-                                0xFFFEFFEE), // Set the background color of the button
+                            primary: Color(0xFFFEFFEE),
                             shape: RoundedRectangleBorder(
-                              borderRadius:
-                              BorderRadius.circular(30.0), // Set the radius
+                              borderRadius: BorderRadius.circular(30.0),
                             ),
                             shadowColor: Color(0x3F000000),
                             elevation: 4,
@@ -144,17 +135,15 @@ class ParentBase extends StatelessWidget {
                                 children: [
                                   Icon(
                                     Icons.accessibility_outlined,
-                                    color: Colors
-                                        .black, // Set your desired icon color
-                                    size: 50.0, // Set your desired icon size
+                                    color: Colors.black,
+                                    size: 50.0,
                                   ),
                                   SizedBox(height: 8.0),
                                   Text(
                                     "Check Child",
                                     style: TextStyle(
                                       color: Colors.black,
-                                      fontSize:
-                                      12.0, // Set your desired text size
+                                      fontSize: 12.0,
                                     ),
                                   ),
                                 ],
@@ -164,6 +153,19 @@ class ParentBase extends StatelessWidget {
                         ),
                       ),
                     ],
+                  ),
+                ),
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: IconButton(
+                    icon: Icon(Icons.settings),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ParentProfilePage()),
+                      );
+                    },
                   ),
                 ),
                 Positioned(
@@ -202,23 +204,24 @@ class ParentBase extends StatelessWidget {
                   ),
                 ),
                 Positioned(
-                    bottom: 10,
-                    left: MediaQuery.of(context).size.width * 0.25,
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.5,
-                      height: MediaQuery.of(context).size.height * 0.1,
-                      child: Text(
-                        'KidCruiser\nVersion 1.0.0\n Order 227 Team',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 18,
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          height: 0,
-                        ),
+                  bottom: 8,
+                  left: MediaQuery.of(context).size.width * 0.22,
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.5,
+                    height: MediaQuery.of(context).size.height * 0.12,
+                    child: Text(
+                      'KidCruiser\nVersion 1.0.0\n Order 227 Team',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 18,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w400,
+                        height: 0,
                       ),
-                    ))
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

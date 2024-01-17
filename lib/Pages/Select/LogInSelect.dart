@@ -17,7 +17,17 @@ class LogInSelect extends StatelessWidget {
     double widthbutton = screenSize.width * 0.25;
     double heightbutton = screenSize.height * 0.1;
     double betweenbutton = screenSize.width * 0.1;
-    return MaterialApp(
+
+    return WillPopScope(
+        onWillPop: () async {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => homePage()),
+          );
+          return false;
+        },
+
+    child: MaterialApp(
       home: Scaffold(
         body: SafeArea(
           child: Container(
@@ -282,6 +292,7 @@ class LogInSelect extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }

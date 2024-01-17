@@ -11,10 +11,14 @@ class CheckChild extends StatefulWidget {
   _CheckChildState createState() => _CheckChildState();
 }
 
+
+
+
 class _CheckChildState extends State<CheckChild> {
   ParentController parentController = ParentController();
   List<Children> childrenList = [];
   bool isLoading = true;
+  String? hostess_name;
 
   @override
   void initState() {
@@ -96,7 +100,7 @@ class _CheckChildState extends State<CheckChild> {
         ],
       ),
       child: ListTile(
-        title: Text('${child.name} ${child.surname}'),
+        title: Text('${child.name} ${child.surname}  (Hostess: ${child.hostessName} ${child.hostessSurName})'),
         subtitle: Text('Status: ${child.state}'),
         trailing: Icon(Icons.arrow_forward),
         onTap: () {
@@ -119,3 +123,4 @@ class _CheckChildState extends State<CheckChild> {
     }
   }
 }
+

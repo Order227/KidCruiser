@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_dev/Controller/Concretes/Hostess/HostessController.dart';
+import 'package:mobile_dev/Pages/Hostess/HostessBasePage.dart';
 import 'package:mobile_dev/Pages/Select/LogInSelect.dart';
 
 import '../../Controller/Abstract/AbstractController.dart';
 import '../../Controller/Concretes/Input/InputController.dart';
-import '../hostess/HostessBase.dart';
+
 
 class LogInHostess extends StatefulWidget {
   @override
@@ -83,7 +84,7 @@ class _hostes_loginState extends State<LogInHostess> {
                           // Navigate to the next page
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => start_cruise_page()),
+                            MaterialPageRoute(builder: (context) => HostessBasePage()),
                           );
                         } else if (result == LoginResult.phoneNumberNotExist) {
                           // Show an error message for non-existent phone number
