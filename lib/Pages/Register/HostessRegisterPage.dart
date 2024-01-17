@@ -21,6 +21,7 @@ class HostessRegisterState extends State<HostessRegister> {
   String? _surnameError;
   String? _phoneNumberError;
   String? _shuttleCodeError;
+  bool _showVerificationCodeInput = false;
 
   @override
   Widget build(BuildContext context) {
@@ -274,8 +275,13 @@ class HostessRegisterState extends State<HostessRegister> {
                                     // Synchronous validation passed
                                     String? existenceError = await hostessRegisterController.checkUserExistence(
                                         inputController.phoneNumberController.text);
+                                    String? shuttelcodeexistenc = await hostessRegisterController.checkShuttleKeyExistence(
+                                        inputController.shuttleCodeController.text);
+                                    print(existenceError);
+                                    print("\n");
+                                    print(existenceError);
                                    // print(existenceError);
-                                    if (existenceError == null) {
+                                    if (existenceError == null && shuttelcodeexistenc==null) {
                                      // print("object");
                                       // No existing user, try to register
                                       bool registrationSuccess = await hostessRegisterController
@@ -286,18 +292,33 @@ class HostessRegisterState extends State<HostessRegister> {
                                         // Registration failed, show dialog
                                         _showErrorDialog(
                                             "Registration failed. Please try again.");
-                                      } else if(registrationSuccess){
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => LogInHostess(),
-                                          ),
-                                        );
+                                      } else if (registrationSuccess) {
+                                      //  print("HAMZAAAA");
+                                        setState(() {
+                                          _showVerificationCodeInput = true;
+                                        });
+
+                                        // Trigger AlertDialog for verification code input
+                                        if (_showVerificationCodeInput) {
+                                          Future.delayed(Duration.zero, () =>
+                                              _showVerificationCodeDialog(
+                                                  context));
+                                        }
+                                        /*
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => LogInParent(),
+                                      ),
+                                    );*/
                                         // Registration success, proceed further
                                       }
                                     } else {
                                       // Existing user, show error dialog
-                                      _showErrorDialog(existenceError);
+                                      if(existenceError!=null)
+                                      _showErrorDialog(existenceError!);
+                                      else if(shuttelcodeexistenc!=null)
+                                        _showErrorDialog(shuttelcodeexistenc!);
                                     }
                                   }
                                 },
@@ -386,6 +407,54 @@ class HostessRegisterState extends State<HostessRegister> {
               ),
             ],
           ),
+    );
+  }
+
+
+  void _showVerificationCodeDialog(BuildContext context) {
+    TextEditingController _verificationCodeController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Enter Verification Code"),
+          content: TextField(
+            controller: _verificationCodeController,
+            decoration: InputDecoration(
+              labelText: "Verification Code",
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: Text('Submit'),
+              onPressed: () {
+                // Add your logic to handle verification code submission
+                String enteredCode = _verificationCodeController.text;
+                if (enteredCode.isEmpty) {
+                  // Handle empty code case, maybe show an error
+                } else {
+                  // Proceed with the verification logic
+                  Navigator.of(context).pop(); // Close the dialog after submission
+
+                  // Optionally navigate or perform other actions
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LogInHostess(),
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
