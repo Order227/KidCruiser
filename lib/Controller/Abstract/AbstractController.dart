@@ -1,3 +1,5 @@
+import 'package:twilio_flutter/twilio_flutter.dart';
+
 enum LoginResult {
   success,
   invalidPhoneNumberOrPassword,
@@ -56,5 +58,19 @@ abstract class AbstractController{
     }
     return null;
   }
+
+  Future<void> sendVerificationCode(String phoneNumber, String verificationCode) async {
+    TwilioFlutter twilioFlutter=TwilioFlutter(accountSid: 'ACd90a8ccf53f8f61aaf80b18be4a81ef9', authToken: '25c4a583009bf2a6f789fe45cae7f2ed', twilioNumber: '+12019037039');
+    try {
+      await twilioFlutter.sendSMS(
+        toNumber: phoneNumber,
+        messageBody: 'Your verification code is: $verificationCode',
+      );
+      print('SMS sent successfully');
+    } catch (e) {
+      print('Error sending SMS: $e');
+    }
+  }
+
 
 }
