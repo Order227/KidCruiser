@@ -219,11 +219,11 @@ class HostessController extends AbstractController{
 
 
     var data={
-      'to' : 'ftwGgrziTgukYRl0Wo9F3P:APA91bFpVV0XuiXBEGiElIlUKSGpMtWkcIjtce60O6vo9Q13tAlLXsGKg5YablowALaXnd9SFuhTjQ0jgVSdLMccB6Xa273MBku3OXIrIFca3gpahS9jVne8mRFnWZBs4Y8rLD-UVXow',
+      'to' : 'dAs4yb8-TWS8WJG9VzSeEV:APA91bGVleXmYKen87Bn2yumnaMvfHQ_-QrbpHC4Mm-KTDiaCNu_Hdj0i6Usc0o762g7ltLt69BQr08-niznPkfbcP9CFoS4wExHtHIxZIfY0Yz9-5vR4Fb4EEJ3DgyvG613CnMhY9q-',
       'priority' : 'high',
       'notification' : {
         'title' : 'Kid Cruiser',
-        'body' : 'COCUK YOLDA',
+        'body' : 'COCUGUNU SIKIYOLAR KOS AGZINA DAYIYOLAR',
       }
     };
     await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
