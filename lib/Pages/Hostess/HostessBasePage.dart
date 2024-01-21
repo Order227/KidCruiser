@@ -164,61 +164,6 @@ class HostessBasePageState extends State<HostessBasePage> {
                   },
                 ),
               ),
-
-              Positioned(
-                left: (MediaQuery.of(context).size.width - MediaQuery.of(context).size.width * 0.5) / 2,
-                top: (MediaQuery.of(context).size.height - MediaQuery.of(context).size.height * 0.3) / 2,
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.5,
-                      child: Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: Text(
-                          "Select School",
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                    //SizedBox(height: 10),
-                    Container(
-                      alignment: Alignment.center,
-                      width: MediaQuery.of(context).size.width * 0.5,
-                      decoration: BoxDecoration(
-                        color: Colors.amberAccent,
-                        borderRadius: BorderRadius.circular(MediaQuery.of(context).size.height * 0.036),
-                      ),
-                      child: DropdownButton<String>(
-                        value: selectedSchool,
-                        isExpanded: true,
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            selectedSchool = newValue;
-                          });
-                        },
-                        items: <String>['GEBZE TECHNICAL UNIVERSITY', 'ISTANBUL TECHNICAL UNIVERSITY', 'SLAP UNIVERSITY', 'DEEPTHROAT UNIVERSITY']
-                            .map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(
-
-
-                              value.length > 11
-                                  ? "    "+value.substring(0, 8) + "..."
-                                  : value,
-                            ),
-
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-
-
             ],
           ),
         ),
