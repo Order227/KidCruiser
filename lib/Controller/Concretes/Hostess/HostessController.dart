@@ -1,11 +1,15 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:mobile_dev/Controller/Abstract/AbstractController.dart';
 import 'package:mobile_dev/Controller/Concretes/Input/InputController.dart';
 import 'package:mobile_dev/DAOServices/MyFirebase.dart';
+import 'package:mobile_dev/DAOServices/PushNotificationService.dart';
 import 'package:mobile_dev/Entities/Concretes/Children.dart';
 import 'package:mobile_dev/Entities/Concretes/Hostess.dart';
-
+import 'package:http/http.dart' as http;
 
 
 
@@ -15,7 +19,7 @@ class HostessController extends AbstractController{
   static Hostess hostess = Hostess();
   Hostess hostess_ = hostess;
   MyFirebase myFirebase=MyFirebase();
-
+  PushNotificationService pushNotificationService = PushNotificationService();
   Future<LoginResult> logIn(InputController inputController, FormState formState) async {
     if (!formState.validate()) {
       return LoginResult.error;
@@ -202,11 +206,40 @@ class HostessController extends AbstractController{
       await FirebaseFirestore.instance.collection('Children')
           .doc(documentId)
           .update({'state': children.state});
+
+      var data = myFirebase.querySnapshot.docs.first;
+
+      String fCMToken = data['parent_fCMToken'];
+
+      sendNotification(fCMToken, "${children.name} ${children.surname}'s state is: ${children.state}");
     } else {
       print('No document found with the given key');
     }
 
+
   }
+
+  Future<void> sendNotification(String fCMToken, String message) async{
+
+
+    var data={
+      'to' : fCMToken,
+      'priority' : 'high',
+      'notification' : {
+        'title' : 'Kid Cruiser',
+        'body' : message,
+      }
+    };
+    await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+        body: jsonEncode(data),
+        headers: {
+          'Content-Type' : 'application/json; charset=UTF-8',
+          'Authorization' : 'key=AAAARt2NEEI:APA91bFZ8y9epSNDxM0308FqhwJrp1fX7_ZLgzMc9fTxytsbUF2N4z-SdGz2iLrdV7XeDqCqmLNey8fajwESWfrq9w3sEC0GT3BU77rWbfPWGUnMJIL_IXRtMDkbvThNSYPXGwHtaGyN',
+
+        }
+    );
+  }
+
 
 
 

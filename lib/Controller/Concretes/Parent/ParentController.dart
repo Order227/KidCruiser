@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:mobile_dev/Controller/Abstract/AbstractController.dart';
 import 'package:mobile_dev/Controller/Concretes/Input/InputController.dart';
 import 'package:mobile_dev/DAOServices/MyFirebase.dart';
@@ -10,6 +11,7 @@ import 'package:flutter/cupertino.dart';
 
 
 class ParentController extends AbstractController {
+
   MyFirebase myFirebase = MyFirebase();
   static Parent parent = Parent();
   Parent parent_ = parent; // Since static field cannot be accessed from another page, i need to create
@@ -17,7 +19,27 @@ class ParentController extends AbstractController {
   Children children = Children();
 
 
+  Future<void> updateFCMTokenInDB() async{
+    myFirebase.querySnapshot = await FirebaseFirestore.instance.collection('Parents')
+        .where('phoneNumber', isEqualTo: parent.phoneNumber)
+        .get();
 
+    var docID = myFirebase.querySnapshot.docs.first.id;
+    print("parent token ${parent.fCMToken}");
+    await FirebaseFirestore.instance.collection('Parents').doc(docID).update({
+      'fCMToken': parent.fCMToken});
+
+    myFirebase.querySnapshot = await FirebaseFirestore.instance.collection('Children')
+        .where('parent_phone_number', isEqualTo: parent.phoneNumber)
+        .get();
+
+    for(var childDoc in myFirebase.querySnapshot.docs){
+      var docID = childDoc.id;
+      await FirebaseFirestore.instance.collection('Children').doc(docID).update({
+        'parent_fCMToken': parent.fCMToken
+      });
+    }
+  }
 
   Future<LoginResult> logIn(InputController inputController, FormState formState) async {
     if (!formState.validate()) {
@@ -60,6 +82,8 @@ class ParentController extends AbstractController {
         parent.password = data['password'];
         parent.phoneNumber = data['phoneNumber'];
         parent.childList = data['child_list'];
+        parent.fCMToken = await FirebaseMessaging.instance.getToken();
+        updateFCMTokenInDB();
       }
 
       return myFirebase.querySnapshot.docs.isNotEmpty;
@@ -72,7 +96,7 @@ class ParentController extends AbstractController {
   Future<String?> checkUserExistence(String phoneNumber) async {
     try {
       var exists = await checkExistForRegister(phoneNumber);
-     // print(exists);
+      // print(exists);
       if (!exists) {
         // User already exists
         return "This phone number is already in use.";
@@ -93,6 +117,7 @@ class ParentController extends AbstractController {
         parent.surname = inputController.surnameController.text;
         parent.phoneNumber = inputController.phoneNumberController.text;
         parent.password = inputController.passwordController.text;
+        parent.fCMToken = await FirebaseMessaging.instance.getToken();
         parent.childList=[];
 
         // Add the Parent object to Firestore
@@ -102,6 +127,7 @@ class ParentController extends AbstractController {
           'phoneNumber': parent.phoneNumber,
           'password': parent.password,
           'child_list': parent.childList,
+          'fCMToken': parent.fCMToken,
         });
       }
       else
@@ -145,7 +171,7 @@ class ParentController extends AbstractController {
 
       return "Phone number doesn't exist";
     } catch (e) {
-     // print("Error: $e");
+      // print("Error: $e");
       return "ERROR";
     }
   }
@@ -176,10 +202,9 @@ class ParentController extends AbstractController {
         myFirebase.querySnapshot = await FirebaseFirestore.instance
             .collection('Shuttle')
             .where('shuttle_code',
-                isEqualTo: inputController.shuttleCodeController.text)
+            isEqualTo: inputController.shuttleCodeController.text)
             .get();
         if (myFirebase.querySnapshot.docs.isEmpty) {
-          print("SES2!");
           return false;
         }
         children.name = inputController.nameController.text;
@@ -191,7 +216,6 @@ class ParentController extends AbstractController {
         children.key = children.hashTcID(inputController.birthDateController.text);
 
         if(await checkChildExist(children.hashTcID(inputController.birthDateController.text))){
-          print("SES!");
           return false;
         }
 
@@ -203,7 +227,7 @@ class ParentController extends AbstractController {
         addChildToHostessDB();
 
       } catch (e) {
-        print("Error2: $e");
+        print("Error: $e");
         return false;
       }
 
@@ -220,7 +244,7 @@ class ParentController extends AbstractController {
         return false;
       }
     }catch (e) {
-      print("Error1: $e");
+      print("Error: $e");
       return false;
     }
 
@@ -239,6 +263,7 @@ class ParentController extends AbstractController {
       'birthDate': inputController.birthDateController.text,
       'key': children.key,
       'state': "EVDE",
+      'parent_fCMToken': parent.fCMToken,
     });
   }
 
@@ -369,4 +394,3 @@ class ParentController extends AbstractController {
 
 
 }
-

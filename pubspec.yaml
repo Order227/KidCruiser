@@ -33,19 +33,31 @@ dependencies:
   firebase_core: ^2.23.0
   cloud_firestore: ^4.13.3
   crypto: ^3.0.1
-  provider: ^6.0.1
   intl: ^0.17.0 # Use the latest version available
   url_launcher: ^6.0.12
+  http: ^0.13.3
+  flutter_local_notifications: ^13.0.0
+  twilio_flutter: ^0.0.9
+  firebase_messaging: ^14.7.9
+  app_settings: ^4.2.0
+
+
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  firebase_auth: ^4.15.0
+  firebase_auth: ^4.16.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
+  flutter_launcher_icons: "^0.13.1"
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon.png"
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your

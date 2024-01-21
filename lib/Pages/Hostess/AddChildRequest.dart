@@ -5,28 +5,28 @@ import 'package:mobile_dev/Entities/Concretes/Children.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 void main() {
-  runApp(HostessApp());
+  runApp(AddChildRequestsApp());
 }
 
-class HostessApp extends StatelessWidget {
+class AddChildRequestsApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Hostess Screen',
+      title: 'Add Child Requests Screen',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HostessScreen(),
+      home: AddChildRequestsScreen(),
     );
   }
 }
 
-class HostessScreen extends StatefulWidget {
+class AddChildRequestsScreen  extends StatefulWidget {
   @override
-  _HostessScreenState createState() => _HostessScreenState();
+  _AddChildRequestsScreenState createState() => _AddChildRequestsScreenState();
 }
 
-class _HostessScreenState extends State<HostessScreen> {
+class _AddChildRequestsScreenState extends State<AddChildRequestsScreen> {
   HostessController hostessController = HostessController();
   List<Children> childrenList = [];
   bool isLoading = true;
@@ -49,7 +49,7 @@ class _HostessScreenState extends State<HostessScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Hostess Screen"),
+        title: Text("Add Child Request Screen"),
         centerTitle: true,
       ),
       body: isLoading
@@ -100,7 +100,6 @@ class _HostessScreenState extends State<HostessScreen> {
           margin: EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
           padding: EdgeInsets.all(10.0),
           decoration: BoxDecoration(
-            color: _getChildColor(child.state!),
             borderRadius: BorderRadius.circular(10.0),
           ),
           child: Column(
@@ -112,43 +111,59 @@ class _HostessScreenState extends State<HostessScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('${child.name} ${child.surname}', style: TextStyle(fontSize: 16)),
+                        Text('${child.name} ${child.surname}', style: TextStyle(fontSize: 20)),
                         SizedBox(height: 4),
-                        Text('Status: ${child.state}', style: TextStyle(fontSize: 14, color: Colors.black54)),
+                        Text('School: ${child.school}, Shuttle Key: ${child.shuttleKey}', style: TextStyle(fontSize: 16, color: Colors.black54)),
                       ],
                     ),
                   ),
-                    DropdownButton<String>(
-                      value: child.state,
-                      onChanged: (String? newValue) {
+                  Row(
+                    children: [
+                      // ACCEPT BUTTON
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            hostessController.updateChildren(child);
+                            // Update the child's status in your data model
+                            // For example, update hostessController.students data
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          // primary: Colors.green, // Change color as needed
+                          side: BorderSide(color: Colors.black, width: 1.0),
+                        ),
+                        child: Image.asset(
+                          'assets/tick-icon.png', // Replace with the actual path to your tick icon
+                          width: 24,  // Adjust the width as needed
+                          height: 24,  // Adjust the height as needed
+                        ),
+                      ),
+                      SizedBox(width: 8), // Add some spacing between the buttons
 
-                        setState(() {
-                          child.state = newValue!;
-
-                          hostessController.updateChildren(child);
-                          // Update the child's status in your data model
-                          // For example, update hostessController.students data
-                        });
-                      },
-                      items: <String>['YOLDA', 'EVDE', 'OKUL']
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                    ),
-                  IconButton(
-                    icon: Icon(Icons.phone),
-                    color: Colors.black,
-                    onPressed: () async {
-                      final phoneNumber = child.phoneNumber;
-                      await launch('tel:$phoneNumber');
-                    },
+                      // REJECT BUTTON
+                      ElevatedButton(
+                        onPressed: () {
+                          // Handle the reject action
+                          setState(() {
+                            hostessController.updateChildren(child);
+                            // Update the child's status in your data model
+                            // For example, update hostessController.students data
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          //primary: Colors.red, // Change color as needed
+                          side: BorderSide(color: Colors.black, width: 1.0),
+                        ),
+                        child: Image.asset(
+                          'assets/cross-icon.png', // Replace with the actual path to your cross icon
+                          width: 24,  // Adjust the width as needed
+                          height: 24,  // Adjust the height as needed
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-
             ],
           ),
         );
@@ -174,18 +189,5 @@ class _HostessScreenState extends State<HostessScreen> {
         style: TextStyle(fontSize: 20),
       ),
     );
-  }
-
-  Color _getChildColor(String status) {
-    switch (status) {
-      case "EVDE":
-        return Color(0xFFFFB238);
-      case "YOLDA":
-        return Color(0xFF9c59b7);
-      case "OKUL":
-        return Color(0xFFe070b0);
-      default:
-        return Colors.grey;
-    }
   }
 }

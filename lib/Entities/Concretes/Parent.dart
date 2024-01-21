@@ -3,6 +3,7 @@ import 'Children.dart';
 
 class Parent extends AbstractUser {
   String? _shuttleKey;
+  String? _fCMToken;
   List<dynamic> _childList = [];
 
   Parent(){
@@ -25,6 +26,15 @@ class Parent extends AbstractUser {
   // Setter for shuttleKey
   set shuttleKey(String? value) {
     _shuttleKey = value;
+  }
+
+  String? get fCMToken {
+    return _fCMToken;
+  }
+
+  // Setter for shuttleKey
+  set fCMToken(String? fCMToken) {
+    _fCMToken = fCMToken;
   }
 
   // Getter for childList
