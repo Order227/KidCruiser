@@ -121,7 +121,7 @@ class _HostessScreenState extends State<HostessScreen> {
                     DropdownButton<String>(
                       value: child.state,
                       onChanged: (String? newValue) {
-                        hostessController.sendNotification();
+
                         setState(() {
                           child.state = newValue!;
 

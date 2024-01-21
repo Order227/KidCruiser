@@ -207,7 +207,11 @@ class HostessController extends AbstractController{
           .doc(documentId)
           .update({'state': children.state});
 
-      //sendNotificationToUser("eSFywYx4RhGV16Dj3WCEHJ:APA91bFZhiVeMan8B5at2FPodBX_8eJgkhIfR4zjTeZzkrIkJyQEQ1pWyOqla8ldZmmM7-Z-1r2WlaU9KEMKjWZHgcvupMtFeDAwvnmwnJUis3wj_v6Uw42WFGRI70YMt6OmmSdchnOj", "${children.name} ${children.surname}'s state is: ${children.state}");
+      var data = myFirebase.querySnapshot.docs.first;
+
+      String fCMToken = data['parent_fCMToken'];
+
+      sendNotification(fCMToken, "${children.name} ${children.surname}'s state is: ${children.state}");
     } else {
       print('No document found with the given key');
     }
@@ -215,15 +219,15 @@ class HostessController extends AbstractController{
 
   }
 
-  Future<void> sendNotification() async{
+  Future<void> sendNotification(String fCMToken, String message) async{
 
 
     var data={
-      'to' : 'dAs4yb8-TWS8WJG9VzSeEV:APA91bGVleXmYKen87Bn2yumnaMvfHQ_-QrbpHC4Mm-KTDiaCNu_Hdj0i6Usc0o762g7ltLt69BQr08-niznPkfbcP9CFoS4wExHtHIxZIfY0Yz9-5vR4Fb4EEJ3DgyvG613CnMhY9q-',
+      'to' : fCMToken,
       'priority' : 'high',
       'notification' : {
         'title' : 'Kid Cruiser',
-        'body' : 'COCUGUNU SIKIYOLAR KOS AGZINA DAYIYOLAR',
+        'body' : message,
       }
     };
     await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
