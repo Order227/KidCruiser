@@ -419,5 +419,32 @@ class ParentController extends AbstractController {
     return null; // Return null if the document or field is not found
   }
 
+  Future<void > updatePhoneNumber(String oldPhoneNumber, String newPhoneNumber) async {
+    try {
+      var querySnapshot = await FirebaseFirestore.instance
+          .collection('Parents')
+          .where('phoneNumber', isEqualTo: oldPhoneNumber)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        return ;
+      }
+
+      // Assuming there is only one document with this phone number
+      // If there could be multiple, you'll need to decide how to handle that
+      var doc = querySnapshot.docs.first;
+      await FirebaseFirestore.instance
+          .collection('Parents')
+          .doc(doc.id)
+          .update({'phoneNumber': newPhoneNumber});
+
+      return ;
+    } catch (e) {
+      // print("Error: $e");
+      return ;
+    }
+  }
+
+
 
 }

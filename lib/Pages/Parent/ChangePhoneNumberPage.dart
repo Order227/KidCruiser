@@ -4,6 +4,8 @@ import 'package:mobile_dev/Controller/Concretes/Parent/ParentController.dart';
 import 'package:mobile_dev/Pages/Parent/ParentBase.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../LogIn/ParentLoginPage.dart';
+
 
 
 class ChangePhoneNumberPage extends StatefulWidget {
@@ -116,7 +118,9 @@ class _ChangePhoneNumberPage extends State<ChangePhoneNumberPage> {
                                         context,"New PhoneNumber is exist already");
                                   } else if (phoennumbercheck!=null) {
                                     // print("HAMZAAAA");
-                                    _verifyPhoneNumber(inputController.changephonenumber.text.toString());
+                                    // _verifyPhoneNumber(inputController.changephonenumber.text.toString());
+                                    print("==>>> " +inputController.changephonenumber.text.toString());
+                                    inputController.sendVerificationCode();
                                     _showVerificationCodeDialog(context);
                                     /*  Navigator.push(
                                       context,
@@ -246,7 +250,7 @@ class _ChangePhoneNumberPage extends State<ChangePhoneNumberPage> {
         return AlertDialog(
           title: Text("Enter Verification Code"),
           content: TextField(
-            controller: _verificationCodeController,
+            controller: inputController.verificaitoncode,
             decoration: InputDecoration(
               labelText: "Verification Code",
             ),
@@ -262,15 +266,19 @@ class _ChangePhoneNumberPage extends State<ChangePhoneNumberPage> {
               child: Text('Submit'),
               onPressed: () {
                 // Add your logic to handle verification code submission
-                String enteredCode = _verificationCodeController.text;
-                if (enteredCode.isEmpty) {
-                  // Handle empty code case, maybe show an error
+                print(inputController.verificaitoncode.text);
+                bool res=inputController.verifycode();
+                if (res) {
+                  parentController.updatePhoneNumber(inputController.phoneNumberController.text.toString(),inputController.changephonenumber.text.toString());
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LogInParent(),
+                    ),
+                  );
                 } else {
                   // Proceed with the verification logic
-                  Navigator.of(context).pop(); // Close the dialog after submission
-
-                  // Optionally navigate or perform other actions
-                  _submitVerificationCode(_verificationCodeController.text.toString());
+                  _showErrorDialog(context,"Invalid CODE !");
                 }
               },
             ),
