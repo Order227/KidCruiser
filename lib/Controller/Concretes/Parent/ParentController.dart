@@ -362,7 +362,8 @@ class ParentController extends AbstractController {
           child.phoneNumber = data['parentPhoneNumber'];
           child.hostessName = await getHostessName(element);
           child.hostessSurName = await getHostessSurName(element);
-          child.hostessPhoneNumber = await getHostessPhoneNumber();
+          child.hostessPhoneNumber = await getHostessPhoneNumber(child.shuttleKey);
+
           bool isActive = data['is_active'];
           if(isActive){
             childrenList.add(child);
@@ -482,11 +483,11 @@ class ParentController extends AbstractController {
     }
   }
 
-  Future<String?> getHostessPhoneNumber() async {
+  Future<String?> getHostessPhoneNumber(String? shuttleKey) async {
     myFirebase.querySnapshot = await FirebaseFirestore.instance
         .collection('Hostess')
         .where(
-      'shuttle_code', isEqualTo: children.shuttleKey,
+      'shuttle_code', isEqualTo: shuttleKey,
     )
         .get();
 

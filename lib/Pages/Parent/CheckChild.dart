@@ -108,6 +108,7 @@ class _CheckChildState extends State<CheckChild> {
           color: Colors.black,
           onPressed: () async {
             final phoneNumber = child.hostessPhoneNumber;
+            print("phone number: ${phoneNumber} - ${child.hostessPhoneNumber}");
             await launch('tel:$phoneNumber');
           },
         ),
