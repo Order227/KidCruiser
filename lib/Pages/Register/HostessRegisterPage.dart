@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_dev/Controller/Concretes/Hostess/HostessController.dart';
 import 'package:mobile_dev/Controller/Concretes/Input/InputController.dart';
+import 'package:mobile_dev/Pages/Hostess/HostessBasePage.dart';
 import 'package:mobile_dev/Pages/LogIn/HostessLoginPage.dart';
 import 'package:mobile_dev/Pages/Select/RegisterSelect.dart';
 
@@ -21,7 +22,6 @@ class HostessRegisterState extends State<HostessRegister> {
   String? _surnameError;
   String? _phoneNumberError;
   String? _shuttleCodeError;
-  bool _showVerificationCodeInput = false;
 
   @override
   Widget build(BuildContext context) {
@@ -292,26 +292,12 @@ class HostessRegisterState extends State<HostessRegister> {
                                         // Registration failed, show dialog
                                         _showErrorDialog(
                                             "Registration failed. Please try again.");
-                                      } else if (registrationSuccess) {
-                                      //  print("HAMZAAAA");
-                                        setState(() {
-                                          _showVerificationCodeInput = true;
-                                        });
-
-                                        // Trigger AlertDialog for verification code input
-                                        if (_showVerificationCodeInput) {
-                                          Future.delayed(Duration.zero, () =>
-                                              _showVerificationCodeDialog(
-                                                  context));
-                                        }
-                                        /*
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => LogInParent(),
-                                      ),
-                                    );*/
-                                        // Registration success, proceed further
+                                      }
+                                      else{
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(builder: (context) => LogInHostess()),
+                                        );
                                       }
                                     } else {
                                       // Existing user, show error dialog
@@ -411,50 +397,5 @@ class HostessRegisterState extends State<HostessRegister> {
   }
 
 
-  void _showVerificationCodeDialog(BuildContext context) {
-    TextEditingController _verificationCodeController = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Enter Verification Code"),
-          content: TextField(
-            controller: _verificationCodeController,
-            decoration: InputDecoration(
-              labelText: "Verification Code",
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-            TextButton(
-              child: Text('Submit'),
-              onPressed: () {
-                // Add your logic to handle verification code submission
-                String enteredCode = _verificationCodeController.text;
-                if (enteredCode.isEmpty) {
-                  // Handle empty code case, maybe show an error
-                } else {
-                  // Proceed with the verification logic
-                  Navigator.of(context).pop(); // Close the dialog after submission
 
-                  // Optionally navigate or perform other actions
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => LogInHostess(),
-                    ),
-                  );
-                }
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 }

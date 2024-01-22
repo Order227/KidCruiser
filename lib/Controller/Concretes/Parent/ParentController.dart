@@ -277,7 +277,7 @@ class ParentController extends AbstractController {
     var docID = myFirebase.querySnapshot.docs.first.id;
 
     await FirebaseFirestore.instance.collection('Hostess').doc(docID).update({
-      'child_list': FieldValue.arrayUnion([children.key])
+      'pending_list': FieldValue.arrayUnion([children.key])
     });
 
   }

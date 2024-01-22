@@ -90,7 +90,8 @@ class HostessController extends AbstractController{
   Future<bool> register(InputController inputController, FormState formState) async {
     if (formState.validate())
     {
-      if (await checkExistForRegister(inputController.phoneNumberController.text))
+      if (await checkExistForRegister(inputController.phoneNumberController.text)
+        && await checkExistForShuttleCode(inputController.shuttleCodeController.text))
       {
         // Get the values from the text field controllers
         hostess.name = inputController.nameController.text;
@@ -127,6 +128,7 @@ class HostessController extends AbstractController{
     }
     return false;
   }
+
   Future<String?> checkShuttleKeyExistence(String shuttleKey) async {
     try {
       // Query Firestore for the shuttle key
@@ -145,6 +147,7 @@ class HostessController extends AbstractController{
       return 'Error checking shuttle key existence: $e'; // Return false in case of any error
     }
   }
+
   Future<bool> checkExistForRegister(String phoneNumber) async {
     try {
       myFirebase.querySnapshot = await FirebaseFirestore.instance
@@ -161,6 +164,56 @@ class HostessController extends AbstractController{
       print("Error: $e");
       return false;
     }
+  }
+
+  Future<List<Children>> getPendingList() async{
+    List<Children> pendingList = [];
+
+    var shuttleKey = hostess_.shuttleKey;
+
+    myFirebase.querySnapshot = await FirebaseFirestore.instance
+        .collection('Hostess').where(
+      'shuttle_code', isEqualTo: shuttleKey,
+    ).get();
+
+    var docID = myFirebase.querySnapshot.docs.first.id;
+
+    var document = await FirebaseFirestore.instance
+        .collection('Hostess')
+        .doc(docID)
+        .get();
+
+    var data = document.data() as Map<String, dynamic>;
+
+    List<dynamic> childKeys = [];
+
+    childKeys = List<String>.from(data['pending_list']);
+
+    for (var element in childKeys) {
+      myFirebase.querySnapshot = await FirebaseFirestore.instance.collection('Children')
+          .where('key', isEqualTo: element)
+          .get();
+
+      for (var documentSnapshot in myFirebase.querySnapshot.docs) {
+        if (documentSnapshot.exists) {
+          var data = documentSnapshot.data() as Map<String, dynamic>;
+
+          var child = Children();
+          child.key=data['key'];
+          child.name = data['name'];
+          child.surname = data['surname'];
+          child.birthDate = data['birthDate'];
+          child.state = data['state'];
+          child.shuttleKey = data['shuttleKey'];
+          child.school.school_name = data['school_name'];
+          child.phoneNumber = data['parent_phone_number'];
+
+          pendingList.add(child);
+        }
+      }
+    }
+    return pendingList;
+
   }
 
   Future<List<Children>> getChildren() async {
@@ -262,6 +315,20 @@ class HostessController extends AbstractController{
 
   void setSelectedSchoold(String? selectedSchool) {
     hostess.selectedSchool=selectedSchool;
+  }
+
+  Future<bool> checkExistForShuttleCode(String shuttleCode) async{
+    myFirebase.querySnapshot = await FirebaseFirestore.instance
+        .collection('Hostess')
+        .where(
+      'shuttle_code', isEqualTo: shuttleCode,
+    ).get();
+
+    if(myFirebase.querySnapshot.docs.isEmpty){
+      return true;
+    }
+
+    return false;
   }
 
 

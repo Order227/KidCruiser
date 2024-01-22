@@ -38,7 +38,7 @@ class _AddChildRequestsScreenState extends State<AddChildRequestsScreen> {
   }
 
   Future<void> _loadChildren() async {
-    childrenList = await hostessController.getChildren();
+    childrenList = await hostessController.getPendingList();
     childrenList.forEach((element) {print(element.name);});
     setState(() {
       isLoading = false;

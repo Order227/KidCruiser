@@ -173,21 +173,26 @@ class _AddChildPage extends State<AddChildPage> {
                     SizedBox(height: 16.0),
                     buildElevatedButton(
                       onPressed: () async {
+                        bool userConfirmed = await _showVerificationCodeDialog(context);
+
                         bool registrationSuccess=false;
-                        registrationSuccess = await parentController.addChild(
-                            inputController, selectedSchool,_formKey.currentState!);
-                        if (!registrationSuccess) {
-                          // Registration failed, show dialog
-                          _showErrorDialog(
-                              "Adding Child is failed. Please try again.");
-                        }
-                        else{
+                        if(userConfirmed){
+                          registrationSuccess = await parentController.addChild(
+                              inputController, selectedSchool,_formKey.currentState!);
+
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => ParentBase()),
                           );
-                          print("SUCCESS!");
-                        }                       },
+                        }
+                        if (!registrationSuccess) {
+
+                          print("ssh: ${userConfirmed}");
+                          // Registration failed, show dialog
+                          _showErrorDialog(
+                              "Adding Child is failed. Please try again.");
+                        }
+                        },
                       label: "Add Child",
                     ),
                   ],
@@ -309,5 +314,36 @@ class _AddChildPage extends State<AddChildPage> {
             ],
           ),
     );
+  }
+
+  Future<bool> _showVerificationCodeDialog(BuildContext context) async {
+    bool userConfirmed = false;
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Are you sure to add child?"),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(false); // Close the dialog with false
+              },
+            ),
+            TextButton(
+              child: Text('Add'),
+              onPressed: () {
+                // User confirmed, close the dialog with true
+                userConfirmed=true;
+                Navigator.of(context).pop(true);
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    return userConfirmed;
   }
 }
