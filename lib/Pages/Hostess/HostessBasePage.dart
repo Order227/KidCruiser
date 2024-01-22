@@ -12,7 +12,7 @@ class HostessBasePage extends StatefulWidget {
 class HostessBasePageState extends State<HostessBasePage> {
   TextEditingController idController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  String? selectedSchool="Selected School";
+  String? selectedSchool;
 
   @override
   void dispose() {
@@ -182,16 +182,15 @@ class HostessBasePageState extends State<HostessBasePage> {
                       ),
                     ),
                     //SizedBox(height: 10),
-                    Container(
-                      alignment: Alignment.center,
+                   Container(
                       width: MediaQuery.of(context).size.width * 0.5,
                       decoration: BoxDecoration(
-                        color: Colors.amberAccent,
+                        color: Colors.white, // Set the desired background color for the dropdown button
                         borderRadius: BorderRadius.circular(MediaQuery.of(context).size.height * 0.036),
                       ),
                       child: DropdownButton<String>(
                         value: selectedSchool,
-                        isExpanded: true,
+                        isExpanded: true, // Set isExpanded to true
                         onChanged: (String? newValue) {
                           setState(() {
                             selectedSchool = newValue;
@@ -202,13 +201,10 @@ class HostessBasePageState extends State<HostessBasePage> {
                           return DropdownMenuItem<String>(
                             value: value,
                             child: Text(
-
-
-                              value.length > 11
-                                  ? "    "+value.substring(0, 8) + "..."
+                              value.length > 11 // Set the maximum length you desire
+                                  ? "    "+value.substring(0, 8) + "..." // Display only a portion if it's too long
                                   : value,
                             ),
-
                           );
                         }).toList(),
                       ),

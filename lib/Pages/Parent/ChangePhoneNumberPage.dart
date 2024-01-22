@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:mobile_dev/Controller/Concretes/Input/InputController.dart';
 import 'package:mobile_dev/Controller/Concretes/Parent/ParentController.dart';
 import 'package:mobile_dev/Pages/Parent/ParentBase.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+
 
 class ChangePhoneNumberPage extends StatefulWidget {
   @override
@@ -15,6 +18,9 @@ class _ChangePhoneNumberPage extends State<ChangePhoneNumberPage> {
   InputController inputController = InputController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _showVerificationCodeInput = false;
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _codeController = TextEditingController();
+  late String _verificationId;
 
   @override
   Widget build(BuildContext context) {
@@ -112,16 +118,15 @@ class _ChangePhoneNumberPage extends State<ChangePhoneNumberPage> {
                                         context,"New PhoneNumber is exist already");
                                   } else if (phoennumbercheck!=null) {
                                     // print("HAMZAAAA");
-
-                                      _showVerificationCodeInput = true;
-
-
-                                    // Trigger AlertDialog for verification code input
-                                    if (_showVerificationCodeInput) {
-                                      Future.delayed(Duration.zero, () =>
-                                          _showVerificationCodeDialog(
-                                              context));
-                                    }
+                                   // _verifyPhoneNumber(inputController.changephonenumber.text.toString());
+                                    inputController.sendSms();
+                                    _showVerificationCodeDialog(context);
+                                 /*  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => PhoneVerificationScreen(),
+                                      ),
+                                    );*/
                                     /*
                                     Navigator.push(
                                       context,
@@ -244,7 +249,7 @@ class _ChangePhoneNumberPage extends State<ChangePhoneNumberPage> {
         return AlertDialog(
           title: Text("Enter Verification Code"),
           content: TextField(
-            controller: _verificationCodeController,
+            controller: inputController.verificaitoncode,
             decoration: InputDecoration(
               labelText: "Verification Code",
             ),
@@ -268,12 +273,8 @@ class _ChangePhoneNumberPage extends State<ChangePhoneNumberPage> {
                   Navigator.of(context).pop(); // Close the dialog after submission
 
                   // Optionally navigate or perform other actions
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ParentBase(),
-                    ),
-                  );
+                  inputController.verifycode();
+                  _submitVerificationCode(_verificationCodeController.text.toString());
                 }
               },
             ),
@@ -282,5 +283,58 @@ class _ChangePhoneNumberPage extends State<ChangePhoneNumberPage> {
       },
     );
   }
+
+  void _verifyPhoneNumber( String phoneIn) async {
+   // print( '========>> '+'+90' + _phoneController.text.toString());
+    await FirebaseAuth.instance.verifyPhoneNumber(
+      timeout: Duration(seconds: 30),
+      phoneNumber: '+9' + phoneIn,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        return;
+        // Automatic handling of the verification process
+
+      },
+      verificationFailed: (FirebaseAuthException e) async{
+        return;
+        // Handle the error
+      },
+      codeSent: (String verificationId, int? resendToken) async{
+        _verificationId=verificationId;
+
+
+        return;
+        // Update the UI to allow the user to enter the verification code
+        setState(() {
+          _verificationId = verificationId;
+        });
+      },
+      codeAutoRetrievalTimeout: (String verificationId) async{
+        return;
+        // Auto retrieval timeout
+      },
+    );
+  }
+
+  void _submitVerificationCode( String smscontrol) async {
+    try {
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: _verificationId,
+        smsCode: smscontrol,
+      );
+      await FirebaseAuth.instance.signInWithCredential(credential);
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ParentBase(),
+        ),
+      );
+      // Phone number verified successfully
+    } on FirebaseAuthException catch (e) {
+      // Handle the error
+    }
+  }
+
+
 
 }
