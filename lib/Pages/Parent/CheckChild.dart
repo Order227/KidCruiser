@@ -107,7 +107,7 @@ class _CheckChildState extends State<CheckChild> {
           icon: Icon(Icons.phone),
           color: Colors.black,
           onPressed: () async {
-            final phoneNumber = child.phoneNumber;
+            final phoneNumber = child.hostessPhoneNumber;
             await launch('tel:$phoneNumber');
           },
         ),

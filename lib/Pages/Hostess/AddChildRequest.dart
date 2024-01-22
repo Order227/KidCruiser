@@ -113,7 +113,7 @@ class _AddChildRequestsScreenState extends State<AddChildRequestsScreen> {
                       children: [
                         Text('${child.name} ${child.surname}', style: TextStyle(fontSize: 20)),
                         SizedBox(height: 4),
-                        Text('School: ${child.school}, Shuttle Key: ${child.shuttleKey}', style: TextStyle(fontSize: 16, color: Colors.black54)),
+                        Text('School: ${child.school.school_name}, Shuttle Key: ${child.shuttleKey}', style: TextStyle(fontSize: 16, color: Colors.black54)),
                       ],
                     ),
                   ),

@@ -13,6 +13,7 @@ class Children extends AbstractUser{
   late String _key;
   String? _birthDate;
   String? _state;
+  String? _hostessPhoneNumber;
 
   String? _parentPhoneNumber;
 // Define a constructor with named parameters
@@ -27,6 +28,7 @@ class Children extends AbstractUser{
     String? state,
     String? carPlateNumber,
     String? parentPhoneNumber,
+    String? hostessPhoneNumber,
   }) {
     this.name = name;
     this.surname = surname;
@@ -38,6 +40,7 @@ class Children extends AbstractUser{
     _state = state;
 
     _parentPhoneNumber = parentPhoneNumber;
+    _hostessPhoneNumber = _hostessPhoneNumber;
   }
 
   String? get state => _state;
@@ -107,5 +110,13 @@ class Children extends AbstractUser{
 
   set parentPhoneNumber(String? value) {
     _parentPhoneNumber = value;
+  }
+
+  String? get hostessPhoneNumber{
+    return this._hostessPhoneNumber;
+  }
+
+  set hostessPhoneNumber(String? hostessPhoneNumber) {
+    _hostessPhoneNumber = hostessPhoneNumber;
   }
 }
