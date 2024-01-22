@@ -5,7 +5,7 @@ import 'package:mobile_dev/Pages/Home/HomePage.dart';
 import 'package:mobile_dev/Pages/Hostess/AddChildRequest.dart';
 import 'package:mobile_dev/Pages/Hostess/HostessCheckChildPage.dart';
 import 'package:mobile_dev/Pages/Hostess/HostessProfilePage.dart';
-
+import 'package:mobile_dev/Entities/Concretes/Children.dart'; // yeni *******************************************
 
 class HostessBasePage extends StatefulWidget {
   @override
@@ -18,8 +18,8 @@ class HostessBasePageState extends State<HostessBasePage> {
   HostessController hostessController = HostessController();
   SchoolController schoolController = SchoolController();
   List<DropdownMenuItem<String>> dropdownMenuItems = [];
-  String? selectedSchool;
-
+  String? selectedSchool; 
+  List<Children> childrenList = [];  // yeni *******************************************
   @override
   void dispose() {
     idController.dispose();
@@ -37,6 +37,7 @@ class HostessBasePageState extends State<HostessBasePage> {
 
   Future<void> fetchData() async {
     List<String> schoolList = await schoolController.getSchoolsForHostess(hostessController.hostess_.shuttleKey);
+    childrenList = await hostessController.getPendingList();                     // yeni *******************************************
     List<DropdownMenuItem<String>> items = schoolList.map((String schoolName) {
       return DropdownMenuItem<String>(
         value: schoolName,
@@ -142,39 +143,57 @@ class HostessBasePageState extends State<HostessBasePage> {
                 ),
 
                 // ADD CHILD REQUESTS BUTTON
-                Positioned(
-                  top: MediaQuery.of(context).size.height * 0.08,
-                  width: MediaQuery.of(context).size.width * 0.31,
-                  child: Center(
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => AddChildRequestsScreen()),
-                        );
-                      },
-                      child: Container(
-                        width: MediaQuery.of(context).size.width * 0.15,
-                        height: MediaQuery.of(context).size.height * 0.07,
-                        decoration: ShapeDecoration(
-                          // color: Colors.white, // Adjust color as needed
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(MediaQuery.of(context).size.height * 0.036),
-                            side: BorderSide(color: Colors.black, width: 2.0),
+Positioned(
+  top: MediaQuery.of(context).size.height * 0.08,
+  width: MediaQuery.of(context).size.width * 0.31,
+  child: Stack(
+    children: [
+      Center(
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AddChildRequestsScreen()),
+            );
+          },
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.15,
+            height: MediaQuery.of(context).size.height * 0.07,
+            decoration: ShapeDecoration(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(MediaQuery.of(context).size.height * 0.036),
+                side: BorderSide(color: Colors.black, width: 2.0),
+              ),
+            ),
+            child: Center(
+              child: Image.asset(
+                'assets/person-icon.png',
+                width: 24,
+                height: 24,
+              ),
+            ),
+          ),
+        ),
+      ),
 
-                          ),
-                        ),
-                        child: Center(
-                          child: Image.asset(
-                            'assets/person-icon.png', // Replace with the actual path to your person logo
-                            width: 24,  // Adjust the width as needed
-                            height: 24,  // Adjust the height as needed
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+      // Red Dot Positioned on Top Right
+      if (childrenList.length > 0)
+        Positioned(
+  left: MediaQuery.of(context).size.height * 0.09,
+  height: MediaQuery.of(context).size.width * 0.05,
+          child: Container(
+            width: 20,
+            height: 20,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.red,
+            ),
+          ),
+        ),
+    ],
+  ),
+),
+
                 // LOG OUT Button
                 Positioned(
                   left: (MediaQuery.of(context).size.width - MediaQuery.of(context).size.width * 0.472) / 2,
