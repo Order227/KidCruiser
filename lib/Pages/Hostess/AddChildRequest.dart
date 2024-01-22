@@ -83,7 +83,7 @@ class _AddChildRequestsScreenState extends State<AddChildRequestsScreen> {
                   },
                 ),
               ),
-              _buildFinishCruiseButton(),
+
             ],
           ),
         ],
@@ -173,21 +173,5 @@ class _AddChildRequestsScreenState extends State<AddChildRequestsScreen> {
 
 
 
-  Widget _buildFinishCruiseButton() {
-    return ElevatedButton(
-      onPressed: () {
-        // Implement logic for Finish Cruise button
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Color(0xFFF77474),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
-        ),
-      ),
-      child: Text(
-        'Finish Cruise',
-        style: TextStyle(fontSize: 20),
-      ),
-    );
-  }
+
 }
