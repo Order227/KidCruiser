@@ -3,8 +3,9 @@ import 'package:mobile_dev/Controller/Concretes/Hostess/HostessController.dart';
 import 'package:mobile_dev/Controller/Concretes/School/SchoolController.dart';
 import 'package:mobile_dev/Pages/Home/HomePage.dart';
 import 'package:mobile_dev/Pages/Hostess/AddChildRequest.dart';
+import 'package:mobile_dev/Pages/Hostess/HostessCheckChildPage.dart';
 import 'package:mobile_dev/Pages/Hostess/HostessProfilePage.dart';
-import 'package:mobile_dev/Pages/hostess/HostessCheckChildPage.dart';
+
 
 class HostessBasePage extends StatefulWidget {
   @override
@@ -17,7 +18,7 @@ class HostessBasePageState extends State<HostessBasePage> {
   HostessController hostessController = HostessController();
   SchoolController schoolController = SchoolController();
   List<DropdownMenuItem<String>> dropdownMenuItems = [];
-  String? selectedSchool=null;
+  String? selectedSchool;
 
   @override
   void dispose() {
@@ -93,12 +94,12 @@ class HostessBasePageState extends State<HostessBasePage> {
                   child: InkWell(
                     onTap: () {
                       if(selectedSchool!=null){
+                        hostessController.setSelectedSchoold(selectedSchool);
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => HostessCheckChildPage()),
                         );
-                      }
-                      else{
+                      }else{
                         _showErrorDialog(
                             context,"You must select a school before starting cruise!");
                       }
@@ -147,10 +148,10 @@ class HostessBasePageState extends State<HostessBasePage> {
                   child: Center(
                     child: InkWell(
                       onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => AddChildRequestsScreen()),
-                          );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => AddChildRequestsScreen()),
+                        );
                       },
                       child: Container(
                         width: MediaQuery.of(context).size.width * 0.15,
@@ -212,21 +213,21 @@ class HostessBasePageState extends State<HostessBasePage> {
 
                 // LOGO HEADER
                 Positioned(
-                  top: MediaQuery.of(context).size.height * 0.05,
+                  bottom: MediaQuery.of(context).size.height * 0.62,
                   width: MediaQuery.of(context).size.width,
                   child: Center(
                     child: Image.asset(
                       'assets/output_image.png',
-                      width: MediaQuery.of(context).size.width * 0.5,
-                      height: MediaQuery.of(context).size.height * 0.2,
+                      width: MediaQuery.of(context).size.width * 0.6,
+                      height: MediaQuery.of(context).size.height * 0.4,
                     ),
                   ),
                 ),
 
                 // Profile Button
                 Positioned(
-                  top: 10,
-                  right: 10,
+                  right: (MediaQuery.of(context).size.width * 0.05) / 2,
+                  top: MediaQuery.of(context).size.height * 0.09,
                   child: IconButton(
                     icon: Icon(Icons.settings),
                     onPressed: () {
@@ -241,25 +242,45 @@ class HostessBasePageState extends State<HostessBasePage> {
                 //DROP DOWN
 
                 Positioned(
-                  top: MediaQuery.of(context).size.height * 0.3,
-                  left: MediaQuery.of(context).size.width * 0.35,// adjust the position as needed
+                  top: MediaQuery.of(context).size.height * 0.35,
+                  left: MediaQuery.of(context).size.width * 0.35, // adjust the position as needed
 
-                  child: DropdownButton<String>(
-                    value: selectedSchool,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedSchool = newValue;
-                      });
-                    },
-                    items: dropdownMenuItems,
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      color: Colors.black,
-                    ),
-                    underline: SizedBox(),
+                  child: Stack(
+                    children: [
+                      // White button as a background
+                      ElevatedButton(
+                        onPressed: () {}, // No functionality
+                        style: ElevatedButton.styleFrom(
+                          primary: Color.fromARGB(255, 177, 196, 166),
+                          elevation: 0, // No shadow
+                        ),
+                        child: SizedBox(
+                          height: 40, // Adjust the height as needed
+                          width: 82, // Adjust the width as needed
+                        ),
+                      ),
 
+                      // DropdownButton on top
+                      DropdownButton<String>(
+                        value: selectedSchool,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedSchool = newValue;
+                          });
+                        },
+                        items: dropdownMenuItems,
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          color: Colors.black,
+                        ),
+                        underline: SizedBox(),
+                        elevation: 2, // Adjust the elevation as needed
+                        dropdownColor: Colors.white, // Set your desired background color
+                      ),
+                    ],
                   ),
                 ),
+
               ],
             ),
           ),

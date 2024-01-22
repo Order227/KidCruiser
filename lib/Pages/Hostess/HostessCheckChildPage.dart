@@ -22,6 +22,8 @@ class HostessApp extends StatelessWidget {
 }
 
 class HostessCheckChildPage extends StatefulWidget {
+
+
   @override
   _HostessCheckChildPageState createState() => _HostessCheckChildPageState();
 }

@@ -165,8 +165,26 @@ class HostessController extends AbstractController{
 
   Future<List<Children>> getChildren() async {
     List<Children> childrenList = [];
+    var shuttleKey = hostess_.shuttleKey;
 
-    List<dynamic> childKeys = hostess.students;
+    myFirebase.querySnapshot = await FirebaseFirestore.instance
+    .collection('Shuttle').where(
+      'shuttle_code', isEqualTo: shuttleKey,
+    ).get();
+
+    var docID = myFirebase.querySnapshot.docs.first.id;
+
+    var document = await FirebaseFirestore.instance
+        .collection('Shuttle')
+        .doc(docID)
+        .get();
+
+    var data = document.data() as Map<String, dynamic>;
+
+    List<dynamic> childKeys = [];
+    print("SELECTED: ${hostess.selectedSchool}");
+    childKeys = List<String>.from(data[hostess.selectedSchool]);
+
 
     for (var element in childKeys) {
       myFirebase.querySnapshot = await FirebaseFirestore.instance.collection('Children')
@@ -240,6 +258,10 @@ class HostessController extends AbstractController{
 
         }
     );
+  }
+
+  void setSelectedSchoold(String? selectedSchool) {
+    hostess.selectedSchool=selectedSchool;
   }
 
 
