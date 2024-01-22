@@ -1,15 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_dev/Controller/Concretes/Hostess/HostessController.dart';
 import 'package:mobile_dev/Controller/Concretes/Input/InputController.dart';
 import 'package:mobile_dev/Controller/Concretes/Parent/ParentController.dart';
-import 'package:mobile_dev/Pages/LogIn/ParentLoginPage.dart';
+import 'package:mobile_dev/Pages/Hostess/HostessBasePage.dart';
+import 'package:mobile_dev/Pages/LogIn/HostessLoginPage.dart';
+import 'package:mobile_dev/Pages/Parent/ParentBase.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-import 'ParentBase.dart';
+import '../LogIn/ParentLoginPage.dart';
 
-class ChangePasswordPage extends StatelessWidget {
-  ParentController parentController = ParentController();
+
+
+class ChangeHostessPhone extends StatefulWidget {
+  @override
+  _ChangePhoneNumberPage createState() => _ChangePhoneNumberPage();
+}
+
+class _ChangePhoneNumberPage extends State<ChangeHostessPhone> {
+  HostessController hostessController = HostessController();
   InputController inputController = InputController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _showVerificationCodeInput = false;
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _codeController = TextEditingController();
+  late String _verificationId;
 
   @override
   Widget build(BuildContext context) {
@@ -41,20 +55,20 @@ class ChangePasswordPage extends StatelessWidget {
               ),
             ),
           ),
-          Form(
-            key: _formKey,
-            child: Center(
-              child: Builder(
-                builder: (BuildContext context) {
-                  return SingleChildScrollView(
-                    padding: const EdgeInsets.all(16.0),
+          Center(
+            child: Builder(
+              builder: (BuildContext context) {
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Form(
+                    key: _formKey,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Center(
                           child: Text(
-                            "Change Password",
+                            "Change Phone Number",
                             style: TextStyle(
                               fontSize: 24.0,
                               fontWeight: FontWeight.bold,
@@ -63,90 +77,67 @@ class ChangePasswordPage extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: 16.0),
-                        buildInputLabel("Enter Current Password"),
+                        buildInputLabel("Enter Current PhoneNumber"),
                         buildInputField(
                           context: context,
                           controller:
-                          inputController.passwordController,
-                          validator: parentController.validatePassword,
+                          inputController.phoneNumberController,
+                          validator: hostessController.validatePhoneNumber,
                         ),
+
                         SizedBox(height: 16.0),
-                        buildInputLabel("Enter New Password"),
+                        buildInputLabel("Enter New PhoneNumber"),
                         buildInputField(
                           context: context,
                           controller:
-                          inputController.newpasswordController,
-                          validator: parentController.validatePassword,
-                        ),
-                        SizedBox(height: 16.0),
-                        buildInputLabel("Confirm New Password"),
-                        buildInputField(
-                          context: context,
-                          controller: inputController.newpasswordControllerconfirm,
-                          validator: (value) {
-                            // First, check if the entered value meets your password criteria
-                            String? basicValidation = parentController.validatePassword(value);
-                            if (basicValidation != null) {
-                              // If basic validation fails, return the error message
-                              return basicValidation;
-                            }
-                            // Then, check if the new password and confirm new password match
-                            if (value != inputController.newpasswordController.text) {
-                              return 'Passwords do not match';
-                            }
-                            // If everything is fine, return null
-                            return null;
-                          },
+                          inputController.changephonenumber,
+                          validator: hostessController.validatePhoneNumber,
                         ),
                         SizedBox(height: 32.0),
                         Center(
-            
+
                           child: ElevatedButton(
-            
+
                             onPressed: () async {
                               if (_formKey.currentState?.validate() ??
                                   false) {
                                 // Synchronous validation passed
-                                String? existenceError = await parentController
-                                    .checkExistPassword(
-                                    inputController.passwordController
-                                        .text,parentController.parent_.name!,parentController.parent_.surname!);
+                                String? existenceError = await hostessController
+                                    .checkExistPhone(
+                                    inputController.phoneNumberController
+                                        .text);
                                 print(existenceError);
                                 if (existenceError == null) {
                                   print("object");
                                   // No existing user, try to register
-                                  String? phoennumbercheck = await parentController
-                                      .checkExistPassword(
-                                      inputController.newpasswordController
-                                          .text,parentController.parent_.name!,parentController.parent_.surname!);
+                                  String? phoennumbercheck = await hostessController
+                                      .checkExistPhone(
+                                      inputController.changephonenumber
+                                          .text);
                                   print(phoennumbercheck);
                                   if (phoennumbercheck==null) {
                                     // Registration failed, show dialog
                                     _showErrorDialog(
-                                        context,"New password can not same as old one");
+                                        context,"New PhoneNumber is exist already");
                                   } else if (phoennumbercheck!=null) {
                                     // print("HAMZAAAA");
-
-                                    _showVerificationCodeInput = true;
-
-
-                                    // Trigger AlertDialog for verification code input
-                                    if (_showVerificationCodeInput) {
-                                      parentController.updatePassword(inputController.passwordController.text.toString(),
-                                          inputController.newpasswordController.text.toString(),
-                                          parentController.parent_.name!,
-                                      parentController.parent_.surname!);
-                                      Future.delayed(Duration.zero, () =>
-                                          changedPassword(
-                                              context));
-                                    }
+                                    // _verifyPhoneNumber(inputController.changephonenumber.text.toString());
+                                    print("==>>> " +inputController.changephonenumber.text.toString());
+                                    inputController.sendVerificationCode();
+                                    _showVerificationCodeDialog(context);
+                                    /*  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => PhoneVerificationScreen(),
+                                      ),
+                                    );*/
                                     /*
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => LogInParent(),
-                                        ),
-                                      );*/
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => LogInParent(),
+                                      ),
+                                    );*/
                                     // Registration success, proceed further
                                   }
                                 } else {
@@ -157,18 +148,20 @@ class ChangePasswordPage extends StatelessWidget {
                             },
                             child: Text("Change"),
                           ),
-            
+
                         ),
                       ],
                     ),
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
           ),
         ],
       ),
     );
+
+
   }
 
   Widget buildInputLabel(String label) {
@@ -252,29 +245,103 @@ class ChangePasswordPage extends StatelessWidget {
     );
   }
 
-  void changedPassword(BuildContext context) {
+  void _showVerificationCodeDialog(BuildContext context) {
+    TextEditingController _verificationCodeController = TextEditingController();
     showDialog(
       context: context,
-      builder: (context) =>
-          AlertDialog(
-            title: Text('Completed'),
-            content: Text("Password has Changed"),
-            actions: <Widget>[
-              TextButton(
-                child: Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop(); // Close the dialog
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Enter Verification Code"),
+          content: TextField(
+            controller: inputController.verificaitoncode,
+            decoration: InputDecoration(
+              labelText: "Verification Code",
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: Text('Submit'),
+              onPressed: () {
+                // Add your logic to handle verification code submission
+                print(inputController.verificaitoncode.text);
+                bool res=inputController.verifycode();
+                if (res) {
+                  hostessController.updatePhoneNumber(inputController.phoneNumberController.text.toString(),inputController.changephonenumber.text.toString());
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => LogInParent(),
+                      builder: (context) => LogInHostess(),
                     ),
                   );
-                },
-              ),
-            ],
-          ),
+                } else {
+                  // Proceed with the verification logic
+                  _showErrorDialog(context,"Invalid CODE !");
+                }
+              },
+            ),
+          ],
+        );
+      },
     );
   }
+
+  void _verifyPhoneNumber( String phoneIn) async {
+    // print( '========>> '+'+90' + _phoneController.text.toString());
+    await FirebaseAuth.instance.verifyPhoneNumber(
+      timeout: Duration(seconds: 30),
+      phoneNumber: '+9' + phoneIn,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        return;
+        // Automatic handling of the verification process
+
+      },
+      verificationFailed: (FirebaseAuthException e) async{
+        return;
+        // Handle the error
+      },
+      codeSent: (String verificationId, int? resendToken) async{
+        _verificationId=verificationId;
+
+
+        return;
+        // Update the UI to allow the user to enter the verification code
+        setState(() {
+          _verificationId = verificationId;
+        });
+      },
+      codeAutoRetrievalTimeout: (String verificationId) async{
+        return;
+        // Auto retrieval timeout
+      },
+    );
+  }
+
+  void _submitVerificationCode( String smscontrol) async {
+    try {
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: _verificationId,
+        smsCode: smscontrol,
+      );
+      await FirebaseAuth.instance.signInWithCredential(credential);
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LogInHostess(),
+        ),
+      );
+      // Phone number verified successfully
+    } on FirebaseAuthException catch (e) {
+      // Handle the error
+    }
+  }
+
+
 
 }

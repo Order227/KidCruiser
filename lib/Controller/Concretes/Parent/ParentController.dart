@@ -181,14 +181,16 @@ class ParentController extends AbstractController {
   }
 
 
-  Future<String ?> checkExistPassword(String password) async {
+  Future<String ?> checkExistPassword(String password,String name,String surname) async {
     try {
-      myFirebase.querySnapshot = await FirebaseFirestore.instance
+      var querySnapshot = await FirebaseFirestore.instance
           .collection('Parents')
+          .where('name', isEqualTo: name)
+          .where('surname', isEqualTo: surname)
           .where('password', isEqualTo: password)
           .get();
 
-      if (myFirebase.querySnapshot.docs.isNotEmpty) {
+      if (querySnapshot.docs.isNotEmpty) {
         return null;
       }
 
@@ -198,6 +200,7 @@ class ParentController extends AbstractController {
       return "ERROR";
     }
   }
+
 
   Future<bool> addChild(InputController inputController, String? selectedSchool,
       FormState formState) async {
@@ -441,6 +444,35 @@ class ParentController extends AbstractController {
           .collection('Parents')
           .doc(doc.id)
           .update({'phoneNumber': newPhoneNumber});
+
+      return ;
+    } catch (e) {
+      // print("Error: $e");
+      return ;
+    }
+  }
+
+  Future<void > updatePassword(String oldPassword, String newPassword,String name,String surname) async {
+    try {
+      var querySnapshot = await FirebaseFirestore.instance
+          .collection('Parents')
+          .where('name', isEqualTo: name)
+          .where('surname', isEqualTo: surname)
+          .where('password', isEqualTo: oldPassword)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        return ;
+      }
+
+      // Assuming there is only one document with this phone number
+      // If there could be multiple, you'll need to decide how to handle that
+      print("CONTROLL");
+      var doc = querySnapshot.docs.first;
+      await FirebaseFirestore.instance
+          .collection('Parents')
+          .doc(doc.id)
+          .update({'password': newPassword});
 
       return ;
     } catch (e) {

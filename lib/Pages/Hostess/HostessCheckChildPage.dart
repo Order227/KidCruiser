@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_dev/Controller/Concretes/Hostess/HostessController.dart';
 import 'package:mobile_dev/Controller/Concretes/Parent/ParentController.dart';
 import 'package:mobile_dev/Entities/Concretes/Children.dart';
+import 'package:mobile_dev/Pages/Hostess/HostessBasePage.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 void main() {
@@ -22,8 +23,6 @@ class HostessApp extends StatelessWidget {
 }
 
 class HostessCheckChildPage extends StatefulWidget {
-
-
   @override
   _HostessCheckChildPageState createState() => _HostessCheckChildPageState();
 }
@@ -41,7 +40,9 @@ class _HostessCheckChildPageState extends State<HostessCheckChildPage> {
 
   Future<void> _loadChildren() async {
     childrenList = await hostessController.getChildren();
-    childrenList.forEach((element) {print(element.name);});
+    childrenList.forEach((element) {
+      print(element.name);
+    });
     setState(() {
       isLoading = false;
     });
@@ -57,39 +58,67 @@ class _HostessCheckChildPageState extends State<HostessCheckChildPage> {
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : Stack(
-        children: [
-          Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            clipBehavior: Clip.antiAlias,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment(0.00, -1.00),
-                end: Alignment(0, 1),
-                colors: [
-                  Color(0xDBFFFBFB),
-                  Color(0xF1C6B8C6),
-                  Color(0xF3D8D6C2),
-                  Color(0xFFDBCFC4),
-                ],
-              ),
-            ),
-          ),
-          Column(
-            children: [
-              Expanded(
-                child: ListView.builder(
-                  itemCount: childrenList.length,
-                  itemBuilder: (context, index) {
-                    return _buildChildContainer(childrenList[index]);
-                  },
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment(0.00, -1.00),
+                      end: Alignment(0, 1),
+                      colors: [
+                        Color(0xDBFFFBFB),
+                        Color(0xF1C6B8C6),
+                        Color(0xF3D8D6C2),
+                        Color(0xFFDBCFC4),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-              _buildFinishCruiseButton(),
-            ],
-          ),
-        ],
-      ),
+                Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: childrenList.length,
+                        itemBuilder: (context, index) {
+                          return _buildChildContainer(childrenList[index]);
+                        },
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () async {
+                        bool checkfinish = await hostessController
+                            .canFinishcruise(childrenList);
+                        print(checkfinish);
+                        if (checkfinish) {
+                          print(("CHECK"));
+                          _showErrorDialog(context,
+                              "You can not finish the Cruise.\nYou must drop off the chilren");
+                          //Navigator.of(context).pop();
+                        } else {
+                          _showFinish(context,"You can Finish the cruise");
+                         // Navigator.of(context).pop();
+
+                        }
+
+                        // Implement logic for Finish Cruise button
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFFF77474),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      child: Text(
+                        'Finish Cruise',
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
     );
   }
 
@@ -114,32 +143,34 @@ class _HostessCheckChildPageState extends State<HostessCheckChildPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('${child.name} ${child.surname}', style: TextStyle(fontSize: 16)),
+                        Text('${child.name} ${child.surname}',
+                            style: TextStyle(fontSize: 16)),
                         SizedBox(height: 4),
-                        Text('Status: ${child.state}', style: TextStyle(fontSize: 14, color: Colors.black54)),
+                        Text('Status: ${child.state}',
+                            style:
+                                TextStyle(fontSize: 14, color: Colors.black54)),
                       ],
                     ),
                   ),
-                    DropdownButton<String>(
-                      value: child.state,
-                      onChanged: (String? newValue) {
+                  DropdownButton<String>(
+                    value: child.state,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        child.state = newValue!;
 
-                        setState(() {
-                          child.state = newValue!;
-
-                          hostessController.updateChildren(child);
-                          // Update the child's status in your data model
-                          // For example, update hostessController.students data
-                        });
-                      },
-                      items: <String>['YOLDA', 'EVDE', 'OKUL']
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                    ),
+                        hostessController.updateChildren(child);
+                        // Update the child's status in your data model
+                        // For example, update hostessController.students data
+                      });
+                    },
+                    items: <String>['YOLDA', 'EVDE', 'OKUL']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
                   IconButton(
                     icon: Icon(Icons.phone),
                     color: Colors.black,
@@ -150,7 +181,6 @@ class _HostessCheckChildPageState extends State<HostessCheckChildPage> {
                   ),
                 ],
               ),
-
             ],
           ),
         );
@@ -158,11 +188,28 @@ class _HostessCheckChildPageState extends State<HostessCheckChildPage> {
     );
   }
 
-
-
-  Widget _buildFinishCruiseButton() {
+  /*Widget _buildFinishCruiseButton() {
     return ElevatedButton(
-      onPressed: () {
+      onPressed: () async {
+        bool checkfinish =
+            await hostessController.canFinishcruise(childrenList);
+        print(checkfinish);
+        if (checkfinish) {
+          print(("CHECK"));
+          _showErrorDialog(
+              "You can not finish the Cruise.\nYou must drop off the chilren");
+          Navigator.of(context).pop();
+        } else {
+          _showFinish("Yu can Finish the cruise");
+          Navigator.of(context).pop();
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HostessBasePage(),
+            ),
+          );
+        }
+
         // Implement logic for Finish Cruise button
       },
       style: ElevatedButton.styleFrom(
@@ -176,7 +223,7 @@ class _HostessCheckChildPageState extends State<HostessCheckChildPage> {
         style: TextStyle(fontSize: 20),
       ),
     );
-  }
+  }*/
 
   Color _getChildColor(String status) {
     switch (status) {
@@ -189,5 +236,47 @@ class _HostessCheckChildPageState extends State<HostessCheckChildPage> {
       default:
         return Colors.grey;
     }
+  }
+
+  void _showErrorDialog(BuildContext context,String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Error'),
+        content: Text(message),
+        actions: <Widget>[
+          TextButton(
+            child: Text('OK'),
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showFinish(BuildContext context,String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('SUCCESFULL'),
+        content: Text(message),
+        actions: <Widget>[
+          TextButton(
+            child: Text('OK'),
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HostessBasePage(),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
   }
 }
