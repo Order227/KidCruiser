@@ -5,11 +5,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:mobile_dev/Controller/Abstract/AbstractController.dart';
 import 'package:mobile_dev/Controller/Concretes/Input/InputController.dart';
+import 'package:mobile_dev/Controller/Concretes/Parent/ParentController.dart';
 import 'package:mobile_dev/DAOServices/MyFirebase.dart';
 import 'package:mobile_dev/DAOServices/PushNotificationService.dart';
 import 'package:mobile_dev/Entities/Concretes/Children.dart';
 import 'package:mobile_dev/Entities/Concretes/Hostess.dart';
-import 'package:http/http.dart' as http;
+
 
 
 
@@ -292,27 +293,6 @@ class HostessController extends AbstractController{
 
   }
 
-  Future<void> sendNotification(String fCMToken, String message) async{
-
-
-    var data={
-      'to' : fCMToken,
-      'priority' : 'high',
-      'notification' : {
-        'title' : 'Kid Cruiser',
-        'body' : message,
-      }
-    };
-    await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
-        body: jsonEncode(data),
-        headers: {
-          'Content-Type' : 'application/json; charset=UTF-8',
-          'Authorization' : 'key=AAAARt2NEEI:APA91bFZ8y9epSNDxM0308FqhwJrp1fX7_ZLgzMc9fTxytsbUF2N4z-SdGz2iLrdV7XeDqCqmLNey8fajwESWfrq9w3sEC0GT3BU77rWbfPWGUnMJIL_IXRtMDkbvThNSYPXGwHtaGyN',
-
-        }
-    );
-  }
-
   void setSelectedSchoold(String? selectedSchool) {
     hostess.selectedSchool=selectedSchool;
   }
@@ -329,6 +309,131 @@ class HostessController extends AbstractController{
     }
 
     return false;
+  }
+
+  Future<void> confirmChild(Children child) async{
+    myFirebase.querySnapshot = await FirebaseFirestore.instance.collection('Children')
+        .where(
+      'key', isEqualTo: child.key,
+    ).get();
+
+    String documentId = myFirebase.querySnapshot.docs.first.id;
+
+    // Update the 'state' field in the document
+    await FirebaseFirestore.instance.collection('Children')
+        .doc(documentId)
+        .update({'is_active': true});
+
+
+    myFirebase.querySnapshot = await FirebaseFirestore.instance
+        .collection('Shuttle')
+        .where('shuttle_code', isEqualTo: child.shuttleKey)
+        .get();
+
+    var docID = myFirebase.querySnapshot.docs.first.id;
+
+    var document = await FirebaseFirestore.instance
+        .collection('Shuttle')
+        .doc(docID)
+        .get();
+
+// Retrieve the 'schools' field as a List<String>
+    List<String> schools = [];
+    if (document.exists && document.data() != null) {
+      var data = document.data() as Map<String, dynamic>;
+      if (data.containsKey('schools') && data['schools'] is List) {
+        schools = List<String>.from(data['schools']);
+      }
+    }
+    print("school name: ${child.school.school_name}");
+    if(schools.contains(child.school.school_name)){
+      await FirebaseFirestore.instance.collection('Shuttle').doc(docID)
+          .update({
+        child.school.school_name!: FieldValue.arrayUnion([child.key]),
+      });
+    }
+
+    await FirebaseFirestore.instance.collection('Shuttle').doc(docID).update({
+      'child_list': FieldValue.arrayUnion([child.key])
+    });
+
+
+    myFirebase.querySnapshot = await FirebaseFirestore.instance
+    .collection('Hostess').where(
+      'shuttle_code', isEqualTo: child.shuttleKey,
+    ).get();
+
+    docID = myFirebase.querySnapshot.docs.first.id;
+
+    await FirebaseFirestore.instance.collection('Hostess').doc(docID).update({
+      'child_list': FieldValue.arrayUnion([child.key])
+    });
+
+    List<dynamic> pendingList = myFirebase.querySnapshot.docs.first['pending_list'];
+
+    // Remove the child key from the 'pending_list'
+    pendingList.remove(child.key);
+
+    // Update the 'pending_list' array in the 'Hostess' document
+    await FirebaseFirestore.instance.collection('Hostess')
+        .doc(docID)
+        .update({'pending_list': pendingList});
+
+    myFirebase.querySnapshot = await FirebaseFirestore.instance.collection('Children')
+    .where(
+      'key', isEqualTo: child.key,
+    ).get();
+
+
+    var fCMToken = myFirebase.querySnapshot.docs.first['parent_fCMToken'];
+    String message = "${child.name} ${child.surname} is successfully added to shuttle!";
+
+    print("FCM,TOKEN: ${fCMToken}");
+
+    sendNotification(fCMToken, message);
+
+
+  }
+
+  Future<void> rejectChild(Children child) async{
+    myFirebase.querySnapshot = await FirebaseFirestore.instance.collection('Children')
+        .where(
+      'key', isEqualTo: child.key,
+    ).get();
+
+    String documentId = myFirebase.querySnapshot.docs.first.id;
+    bool isActive = myFirebase.querySnapshot.docs.first['is_active'];
+    // Update the 'state' field in the document
+
+    if(isActive){
+      return;
+    }
+
+    await FirebaseFirestore.instance.collection('Children')
+        .doc(documentId).delete();
+
+    myFirebase.querySnapshot = await FirebaseFirestore.instance
+    .collection('Hostess')
+    .where(
+      'shuttle_code', isEqualTo: child.shuttleKey,
+    ).get();
+
+    String hostessDocumentId = myFirebase.querySnapshot.docs.first.id;
+
+    // Get the current 'pending_list' array
+    List<dynamic> pendingList = myFirebase.querySnapshot.docs.first['pending_list'];
+
+    // Remove the child key from the 'pending_list'
+    pendingList.remove(child.key);
+
+    // Update the 'pending_list' array in the 'Hostess' document
+    await FirebaseFirestore.instance.collection('Hostess')
+        .doc(hostessDocumentId)
+        .update({'pending_list': pendingList});
+
+
+
+
   }
 
 

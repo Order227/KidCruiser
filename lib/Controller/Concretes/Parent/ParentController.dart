@@ -223,7 +223,7 @@ class ParentController extends AbstractController {
 
         addChildToDB(inputController, selectedSchool);
         addChildToParentDB();
-        addChildToShuttleDB();
+        //addChildToShuttleDB();
         addChildToHostessDB();
 
       } catch (e) {

@@ -123,7 +123,7 @@ class _AddChildRequestsScreenState extends State<AddChildRequestsScreen> {
                       ElevatedButton(
                         onPressed: () {
                           setState(() {
-                            hostessController.updateChildren(child);
+                            hostessController.confirmChild(child);
                             // Update the child's status in your data model
                             // For example, update hostessController.students data
                           });
@@ -145,7 +145,7 @@ class _AddChildRequestsScreenState extends State<AddChildRequestsScreen> {
                         onPressed: () {
                           // Handle the reject action
                           setState(() {
-                            hostessController.updateChildren(child);
+                            hostessController.rejectChild(child);
                             // Update the child's status in your data model
                             // For example, update hostessController.students data
                           });

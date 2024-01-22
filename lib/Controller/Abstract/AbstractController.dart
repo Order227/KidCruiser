@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 enum LoginResult {
   success,
   invalidPhoneNumberOrPassword,
@@ -7,6 +10,27 @@ enum LoginResult {
 
 abstract class AbstractController{
   String? errorMessage="";
+
+  Future<void> sendNotification(String fCMToken, String message) async{
+
+
+    var data={
+      'to' : fCMToken,
+      'priority' : 'high',
+      'notification' : {
+        'title' : 'Kid Cruiser',
+        'body' : message,
+      }
+    };
+    await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+        body: jsonEncode(data),
+        headers: {
+          'Content-Type' : 'application/json; charset=UTF-8',
+          'Authorization' : 'key=AAAARt2NEEI:APA91bFZ8y9epSNDxM0308FqhwJrp1fX7_ZLgzMc9fTxytsbUF2N4z-SdGz2iLrdV7XeDqCqmLNey8fajwESWfrq9w3sEC0GT3BU77rWbfPWGUnMJIL_IXRtMDkbvThNSYPXGwHtaGyN',
+
+        }
+    );
+  }
 
   String? validateName(String? value) {
     if (value == null || value.isEmpty) {
