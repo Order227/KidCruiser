@@ -17,6 +17,7 @@ class _AddChildPage extends State<AddChildPage> {
   SchoolController schoolController = SchoolController();
   List<DropdownMenuItem<String>> dropdownMenuItems = [];
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late DateTime selectedDate;
 
   @override
   void initState() {
@@ -125,10 +126,22 @@ class _AddChildPage extends State<AddChildPage> {
                             firstDate: DateTime(1900),
                             lastDate: DateTime.now(),
                           );
-                          if (pickedDate != null) {
+                          if (pickedDate != null && isWithinAgeRange(pickedDate)) {
+                            setState(() {
+                              selectedDate = pickedDate;
+                            });
+
                             // Format and set the date in controller
                             String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
                             inputController.birthDateController.text = formattedDate;
+                          } else {
+                            // Show an error message to the user
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Please select a valid birth date between 4 and 18 years old.'),
+                                duration: Duration(seconds: 3),
+                              ),
+                            );
                           }
                         },
                         child: AbsorbPointer( // Prevents keyboard from showing
@@ -345,5 +358,12 @@ class _AddChildPage extends State<AddChildPage> {
     );
 
     return userConfirmed;
+  }
+  bool isWithinAgeRange(DateTime selectedDate) {
+    DateTime currentDate = DateTime.now();
+    DateTime age4Date = currentDate.subtract(Duration(days: 365 * 4));
+    DateTime age18Date = currentDate.subtract(Duration(days: 365 * 18));
+
+    return selectedDate.isBefore(age4Date) && selectedDate.isAfter(age18Date);
   }
 }
