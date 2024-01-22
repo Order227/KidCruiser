@@ -20,6 +20,9 @@ class ParentController extends AbstractController {
 
 
   Future<void> updateFCMTokenInDB() async{
+
+
+
     myFirebase.querySnapshot = await FirebaseFirestore.instance.collection('Parents')
         .where('phoneNumber', isEqualTo: parent.phoneNumber)
         .get();
@@ -39,6 +42,7 @@ class ParentController extends AbstractController {
         'parent_fCMToken': parent.fCMToken
       });
     }
+
   }
 
   Future<LoginResult> logIn(InputController inputController, FormState formState) async {

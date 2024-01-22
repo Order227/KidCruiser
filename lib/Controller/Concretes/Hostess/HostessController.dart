@@ -379,23 +379,20 @@ class HostessController extends AbstractController{
         .doc(docID)
         .update({'pending_list': pendingList});
 
-    myFirebase.querySnapshot = await FirebaseFirestore.instance.collection('Children')
-    .where(
-      'key', isEqualTo: child.key,
-    ).get();
 
-
-    var fCMToken = myFirebase.querySnapshot.docs.first['parent_fCMToken'];
-    String message = "${child.name} ${child.surname} is successfully added to shuttle!";
-
-    print("FCM,TOKEN: ${fCMToken}");
-
-    sendNotification(fCMToken, message);
 
 
   }
 
   Future<void> rejectChild(Children child) async{
+
+    var fCMToken = myFirebase.querySnapshot.docs.first['parent_fCMToken'];
+    String message = "${child.name} ${child.surname} isn't added to shuttle!";
+
+    print("FCM,TOKEN: ${fCMToken}");
+
+    sendNotification(fCMToken, message);
+
     myFirebase.querySnapshot = await FirebaseFirestore.instance.collection('Children')
         .where(
       'key', isEqualTo: child.key,
@@ -430,6 +427,12 @@ class HostessController extends AbstractController{
     await FirebaseFirestore.instance.collection('Hostess')
         .doc(hostessDocumentId)
         .update({'pending_list': pendingList});
+
+
+    myFirebase.querySnapshot = await FirebaseFirestore.instance.collection('Children')
+        .where(
+      'key', isEqualTo: child.key,
+    ).get();
 
 
 
