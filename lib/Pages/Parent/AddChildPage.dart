@@ -17,6 +17,7 @@ class _AddChildPage extends State<AddChildPage> {
   SchoolController schoolController = SchoolController();
   List<DropdownMenuItem<String>> dropdownMenuItems = [];
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late DateTime selectedDate;
 
   @override
   void initState() {
@@ -85,7 +86,7 @@ class _AddChildPage extends State<AddChildPage> {
                     Center(
                       child: Text(
                         "Add Child",
-                
+
                         style: TextStyle(
                           fontSize: 24.0,
                           fontWeight: FontWeight.bold,
@@ -96,14 +97,14 @@ class _AddChildPage extends State<AddChildPage> {
                     SizedBox(height: 16.0),
                     buildInputLabel("Child Name"),
                     buildInputField(
-                      controller: inputController.nameController,
-                      validator: parentController.validateName
+                        controller: inputController.nameController,
+                        validator: parentController.validateName
 
                     ),
                     SizedBox(height: 16.0),
                     buildInputLabel("Child Surname"),
                     buildInputField(
-                      controller: inputController.surnameController,
+                        controller: inputController.surnameController,
                         validator: parentController.validateSurname
                     ),
                     SizedBox(height: 16.0),
@@ -125,10 +126,22 @@ class _AddChildPage extends State<AddChildPage> {
                             firstDate: DateTime(1900),
                             lastDate: DateTime.now(),
                           );
-                          if (pickedDate != null) {
+                          if (pickedDate != null && isWithinAgeRange(pickedDate)) {
+                            setState(() {
+                              selectedDate = pickedDate;
+                            });
+
                             // Format and set the date in controller
                             String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
                             inputController.birthDateController.text = formattedDate;
+                          } else {
+                            // Show an error message to the user
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Please select a valid birth date between 4 and 18 years old.'),
+                                duration: Duration(seconds: 3),
+                              ),
+                            );
                           }
                         },
                         child: AbsorbPointer( // Prevents keyboard from showing
@@ -148,7 +161,7 @@ class _AddChildPage extends State<AddChildPage> {
                     SizedBox(height: 16.0),
                     buildInputLabel("Shuttle Code"),
                     buildInputField(
-                      controller: inputController.shuttleCodeController,
+                        controller: inputController.shuttleCodeController,
                         validator: parentController.validateShuttleKey
                     ),
                     SizedBox(height: 16.0),
@@ -192,7 +205,7 @@ class _AddChildPage extends State<AddChildPage> {
                           _showErrorDialog(
                               "Adding Child is failed. Please try again.");
                         }
-                        },
+                      },
                       label: "Add Child",
                     ),
                   ],
@@ -345,5 +358,12 @@ class _AddChildPage extends State<AddChildPage> {
     );
 
     return userConfirmed;
+  }
+  bool isWithinAgeRange(DateTime selectedDate) {
+    DateTime currentDate = DateTime.now();
+    DateTime age4Date = currentDate.subtract(Duration(days: 365 * 4));
+    DateTime age18Date = currentDate.subtract(Duration(days: 365 * 18));
+
+    return selectedDate.isBefore(age4Date) && selectedDate.isAfter(age18Date);
   }
 }

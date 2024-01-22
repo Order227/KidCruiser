@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_dev/Controller/Concretes/Hostess/HostessController.dart';
+import 'package:mobile_dev/Pages/Hostess/ChangeHostessPhone.dart';
 import 'package:mobile_dev/Pages/Hostess/HostessBasePage.dart';
 
 import 'package:mobile_dev/Pages/Parent/ChangePasswordPage.dart';
 import 'package:mobile_dev/Pages/Parent/ParentBase.dart';
 import 'package:mobile_dev/Pages/Parent/changePhoneNumberPage.dart';
+
+import 'Changehostesspassword.dart';
 
 class HostessProfilePage extends StatelessWidget {
   HostessController hostessController = HostessController();
@@ -58,7 +61,7 @@ class HostessProfilePage extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => ChangePhoneNumberPage()),
+                        MaterialPageRoute(builder: (context) => ChangeHostessPhone()),
                       );
                     },
                     style: ElevatedButton.styleFrom(
@@ -99,7 +102,7 @@ class HostessProfilePage extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => ChangePasswordPage()),
+                        MaterialPageRoute(builder: (context) => ChangeHostessPassword()),
                       );
                     },
                     style: ElevatedButton.styleFrom(

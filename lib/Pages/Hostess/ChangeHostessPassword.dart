@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_dev/Controller/Concretes/Input/InputController.dart';
 import 'package:mobile_dev/Controller/Concretes/Parent/ParentController.dart';
-import 'package:mobile_dev/Pages/LogIn/ParentLoginPage.dart';
+import 'package:mobile_dev/Pages/Hostess/HostessBasePage.dart';
+import 'package:mobile_dev/Pages/LogIn/HostessLoginPage.dart';
 
-import 'ParentBase.dart';
+import '../../Controller/Concretes/Hostess/HostessController.dart';
 
-class ChangePasswordPage extends StatelessWidget {
-  ParentController parentController = ParentController();
+
+
+class ChangeHostessPassword extends StatelessWidget {
+  HostessController hostessController = HostessController();
   InputController inputController = InputController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _showVerificationCodeInput = false;
@@ -68,7 +71,7 @@ class ChangePasswordPage extends StatelessWidget {
                           context: context,
                           controller:
                           inputController.passwordController,
-                          validator: parentController.validatePassword,
+                          validator: hostessController.validatePassword,
                         ),
                         SizedBox(height: 16.0),
                         buildInputLabel("Enter New Password"),
@@ -76,7 +79,7 @@ class ChangePasswordPage extends StatelessWidget {
                           context: context,
                           controller:
                           inputController.newpasswordController,
-                          validator: parentController.validatePassword,
+                          validator: hostessController.validatePassword,
                         ),
                         SizedBox(height: 16.0),
                         buildInputLabel("Confirm New Password"),
@@ -85,7 +88,7 @@ class ChangePasswordPage extends StatelessWidget {
                           controller: inputController.newpasswordControllerconfirm,
                           validator: (value) {
                             // First, check if the entered value meets your password criteria
-                            String? basicValidation = parentController.validatePassword(value);
+                            String? basicValidation = hostessController.validatePassword(value);
                             if (basicValidation != null) {
                               // If basic validation fails, return the error message
                               return basicValidation;
@@ -107,18 +110,18 @@ class ChangePasswordPage extends StatelessWidget {
                               if (_formKey.currentState?.validate() ??
                                   false) {
                                 // Synchronous validation passed
-                                String? existenceError = await parentController
+                                String? existenceError = await hostessController
                                     .checkExistPassword(
                                     inputController.passwordController
-                                        .text,parentController.parent_.name!,parentController.parent_.surname!);
+                                        .text,hostessController.hostess_.name!,hostessController.hostess_.surname!);
                                 print(existenceError);
                                 if (existenceError == null) {
                                   print("object");
                                   // No existing user, try to register
-                                  String? phoennumbercheck = await parentController
+                                  String? phoennumbercheck = await hostessController
                                       .checkExistPassword(
                                       inputController.newpasswordController
-                                          .text,parentController.parent_.name!,parentController.parent_.surname!);
+                                          .text,hostessController.hostess_.name!,hostessController.hostess_.surname!);
                                   print(phoennumbercheck);
                                   if (phoennumbercheck==null) {
                                     // Registration failed, show dialog
@@ -132,10 +135,10 @@ class ChangePasswordPage extends StatelessWidget {
 
                                     // Trigger AlertDialog for verification code input
                                     if (_showVerificationCodeInput) {
-                                      parentController.updatePassword(inputController.passwordController.text.toString(),
+                                      hostessController.updatePassword(inputController.passwordController.text.toString(),
                                           inputController.newpasswordController.text.toString(),
-                                          parentController.parent_.name!,
-                                          parentController.parent_.surname!);
+                                          hostessController.hostess_.name!,
+                                          hostessController.hostess_.surname!);
                                       Future.delayed(Duration.zero, () =>
                                           changedPassword(
                                               context));
@@ -267,7 +270,7 @@ class ChangePasswordPage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => LogInParent(),
+                      builder: (context) => LogInHostess(),
                     ),
                   );
                 },

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_dev/Controller/Concretes/Parent/ParentController.dart';
 import 'package:mobile_dev/Entities/Concretes/Children.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() {
   runApp(CheckChild());
@@ -102,10 +103,14 @@ class _CheckChildState extends State<CheckChild> {
       child: ListTile(
         title: Text('${child.name} ${child.surname}  (Hostess: ${child.hostessName} ${child.hostessSurName})'),
         subtitle: Text('Status: ${child.state}'),
-        trailing: Icon(Icons.arrow_forward),
-        onTap: () {
-          // Burada her çocuk için detay sayfasına yönlendirme yapılabilir.
-        },
+        trailing: IconButton(
+          icon: Icon(Icons.phone),
+          color: Colors.black,
+          onPressed: () async {
+            final phoneNumber = child.phoneNumber;
+            await launch('tel:$phoneNumber');
+          },
+        ),
       ),
     );
   }

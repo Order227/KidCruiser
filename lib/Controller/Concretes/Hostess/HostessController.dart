@@ -92,7 +92,7 @@ class HostessController extends AbstractController{
     if (formState.validate())
     {
       if (await checkExistForRegister(inputController.phoneNumberController.text)
-        && await checkExistForShuttleCode(inputController.shuttleCodeController.text))
+          && await checkExistForShuttleCode(inputController.shuttleCodeController.text))
       {
         // Get the values from the text field controllers
         hostess.name = inputController.nameController.text;
@@ -144,7 +144,7 @@ class HostessController extends AbstractController{
         return "Entered shuttle key is not valid."; // Shuttle key does not exist
       }
     } catch (e) {
-    //  print('Error checking shuttle key existence: $e');
+      //  print('Error checking shuttle key existence: $e');
       return 'Error checking shuttle key existence: $e'; // Return false in case of any error
     }
   }
@@ -222,7 +222,7 @@ class HostessController extends AbstractController{
     var shuttleKey = hostess_.shuttleKey;
 
     myFirebase.querySnapshot = await FirebaseFirestore.instance
-    .collection('Shuttle').where(
+        .collection('Shuttle').where(
       'shuttle_code', isEqualTo: shuttleKey,
     ).get();
 
@@ -359,7 +359,7 @@ class HostessController extends AbstractController{
 
 
     myFirebase.querySnapshot = await FirebaseFirestore.instance
-    .collection('Hostess').where(
+        .collection('Hostess').where(
       'shuttle_code', isEqualTo: child.shuttleKey,
     ).get();
 
@@ -410,8 +410,8 @@ class HostessController extends AbstractController{
         .doc(documentId).delete();
 
     myFirebase.querySnapshot = await FirebaseFirestore.instance
-    .collection('Hostess')
-    .where(
+        .collection('Hostess')
+        .where(
       'shuttle_code', isEqualTo: child.shuttleKey,
     ).get();
 
@@ -439,7 +439,120 @@ class HostessController extends AbstractController{
 
   }
 
+  Future<String ?> checkExistPhone(String phoneNumber) async {
+    try {
+      myFirebase.querySnapshot = await FirebaseFirestore.instance
+          .collection('Hostess')
+          .where('phoneNumber', isEqualTo: phoneNumber)
+          .get();
+
+      if (myFirebase.querySnapshot.docs.isNotEmpty) {
+        return null;
+      }
+
+      return "Phone number doesn't exist";
+    } catch (e) {
+      // print("Error: $e");
+      return "ERROR";
+    }
+  }
 
 
+  Future<String ?> checkExistPassword(String password,String name,String surname) async {
+    try {
+      var querySnapshot = await FirebaseFirestore.instance
+          .collection('Hostess')
+          .where('name', isEqualTo: name)
+          .where('surname', isEqualTo: surname)
+          .where('password', isEqualTo: password)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        return null;
+      }
+
+      return "Incorrect Password!";
+    } catch (e) {
+      // print("Error: $e");
+      return "ERROR";
+    }
+  }
+
+
+  Future<void > updatePhoneNumber(String oldPhoneNumber, String newPhoneNumber) async {
+    try {
+      var querySnapshot = await FirebaseFirestore.instance
+          .collection('Hostess')
+          .where('phoneNumber', isEqualTo: oldPhoneNumber)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        return ;
+      }
+
+      // Assuming there is only one document with this phone number
+      // If there could be multiple, you'll need to decide how to handle that
+      var doc = querySnapshot.docs.first;
+      await FirebaseFirestore.instance
+          .collection('Hostess')
+          .doc(doc.id)
+          .update({'phoneNumber': newPhoneNumber});
+
+      return ;
+    } catch (e) {
+      // print("Error: $e");
+      return ;
+    }
+  }
+
+
+  Future<void > updatePassword(String oldPassword, String newPassword,String name,String surname) async {
+    try {
+      var querySnapshot = await FirebaseFirestore.instance
+          .collection('Hostess')
+          .where('surname', isEqualTo: surname)
+          .where('name', isEqualTo: name)
+          .where('password', isEqualTo: oldPassword)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        return ;
+      }
+
+      // Assuming there is only one document with this phone number
+      // If there could be multiple, you'll need to decide how to handle that
+      print("CONTROLL");
+      var doc = querySnapshot.docs.first;
+      await FirebaseFirestore.instance
+          .collection('Hostess')
+          .doc(doc.id)
+          .update({'password': newPassword});
+
+      return ;
+    } catch (e) {
+      // print("Error: $e");
+      return ;
+    }
+  }
+
+  Future<bool> canFinishcruise(  List<Children> childrenList) async
+  {
+    try
+    {
+      bool check=false;
+
+      childrenList.forEach((element){
+        print(element.state);
+        if (element.state=="YOLDA")
+          check=true;
+      });
+      return check;
+    }
+    catch(e)
+    {
+      return false;
+    }
+    return false;
+  }
 
 }
