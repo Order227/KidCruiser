@@ -25,5 +25,36 @@ class SchoolController extends AbstractController{
     return this._schoolList;
   }
 
+  Future<List<String>> getSchoolsForHostess(String? shuttleKey) async{
+    print("SHUTTLE KEY: ${shuttleKey}");
+    List<String> schools = [];
+    try{
+      myFirebase.querySnapshot = await FirebaseFirestore.instance.collection('Shuttle')
+          .where(
+        'shuttle_code', isEqualTo: shuttleKey,
+      ).get();
+
+      var docID = myFirebase.querySnapshot.docs.first.id;
+
+      var document = await FirebaseFirestore.instance
+          .collection('Shuttle')
+          .doc(docID)
+          .get();
+
+
+      if (document.exists && document.data() != null) {
+        var data = document.data() as Map<String, dynamic>;
+        if (data.containsKey('schools') && data['schools'] is List) {
+          schools = List<String>.from(data['schools']);
+        }
+      }
+
+    }catch(e){
+      print("error: ${e}");
+    }
+
+    return schools;
+  }
+
 
 }

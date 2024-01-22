@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_dev/Controller/Concretes/Hostess/HostessController.dart';
+import 'package:mobile_dev/Controller/Concretes/School/SchoolController.dart';
 import 'package:mobile_dev/Pages/Home/HomePage.dart';
 import 'package:mobile_dev/Pages/Hostess/AddChildRequest.dart';
 import 'package:mobile_dev/Pages/Hostess/HostessProfilePage.dart';
-import 'package:mobile_dev/Pages/hostess/CheckChild.dart';
+import 'package:mobile_dev/Pages/hostess/HostessCheckChildPage.dart';
 
 class HostessBasePage extends StatefulWidget {
   @override
@@ -12,6 +14,10 @@ class HostessBasePage extends StatefulWidget {
 class HostessBasePageState extends State<HostessBasePage> {
   TextEditingController idController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  HostessController hostessController = HostessController();
+  SchoolController schoolController = SchoolController();
+  List<DropdownMenuItem<String>> dropdownMenuItems = [];
+  String? selectedSchool=null;
 
   @override
   void dispose() {
@@ -19,6 +25,34 @@ class HostessBasePageState extends State<HostessBasePage> {
     passwordController.dispose();
     super.dispose();
   }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+
+
+  Future<void> fetchData() async {
+    List<String> schoolList = await schoolController.getSchoolsForHostess(hostessController.hostess_.shuttleKey);
+    List<DropdownMenuItem<String>> items = schoolList.map((String schoolName) {
+      return DropdownMenuItem<String>(
+        value: schoolName,
+        child: Text(schoolName),
+      );
+    }).toList();
+
+    items.insert(0, DropdownMenuItem<String>(
+      value: null,
+      child: Text("Select a School"),
+    ));
+
+    setState(() {
+      dropdownMenuItems = items;
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -58,10 +92,16 @@ class HostessBasePageState extends State<HostessBasePage> {
                   top: (MediaQuery.of(context).size.height - MediaQuery.of(context).size.height * 0.07) / 2,
                   child: InkWell(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => HostessScreen()),
-                      );
+                      if(selectedSchool!=null){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => HostessCheckChildPage()),
+                        );
+                      }
+                      else{
+                        _showErrorDialog(
+                            context,"You must select a school before starting cruise!");
+                      }
                     },
                     child: Container(
                       width: MediaQuery.of(context).size.width * 0.5,
@@ -107,10 +147,10 @@ class HostessBasePageState extends State<HostessBasePage> {
                   child: Center(
                     child: InkWell(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => AddChildRequestsScreen()),
-                        );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => AddChildRequestsScreen()),
+                          );
                       },
                       child: Container(
                         width: MediaQuery.of(context).size.width * 0.15,
@@ -197,11 +237,52 @@ class HostessBasePageState extends State<HostessBasePage> {
                     },
                   ),
                 ),
+
+                //DROP DOWN
+
+                Positioned(
+                  top: MediaQuery.of(context).size.height * 0.3,
+                  left: MediaQuery.of(context).size.width * 0.35,// adjust the position as needed
+
+                  child: DropdownButton<String>(
+                    value: selectedSchool,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedSchool = newValue;
+                      });
+                    },
+                    items: dropdownMenuItems,
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      color: Colors.black,
+                    ),
+                    underline: SizedBox(),
+
+                  ),
+                ),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+  void _showErrorDialog(BuildContext context,String message) {
+    showDialog(
+      context: context,
+      builder: (context) =>
+          AlertDialog(
+            title: Text('Error'),
+            content: Text(message),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+              ),
+            ],
+          ),
     );
   }
 }

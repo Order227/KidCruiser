@@ -264,6 +264,7 @@ class ParentController extends AbstractController {
       'key': children.key,
       'state': "EVDE",
       'parent_fCMToken': parent.fCMToken,
+      'is_active' : false,
     });
   }
 
@@ -278,6 +279,7 @@ class ParentController extends AbstractController {
     await FirebaseFirestore.instance.collection('Hostess').doc(docID).update({
       'child_list': FieldValue.arrayUnion([children.key])
     });
+
   }
 
   Future<void> addChildToShuttleDB() async {
@@ -287,6 +289,27 @@ class ParentController extends AbstractController {
         .get();
 
     var docID = myFirebase.querySnapshot.docs.first.id;
+
+    var document = await FirebaseFirestore.instance
+        .collection('Shuttle')
+        .doc(docID)
+        .get();
+
+// Retrieve the 'schools' field as a List<String>
+    List<String> schools = [];
+    if (document.exists && document.data() != null) {
+      var data = document.data() as Map<String, dynamic>;
+      if (data.containsKey('schools') && data['schools'] is List) {
+        schools = List<String>.from(data['schools']);
+      }
+    }
+
+    if(schools.contains(children.school.school_name)){
+      await FirebaseFirestore.instance.collection('Shuttle').doc(docID)
+          .update({
+      children.school.school_name!: FieldValue.arrayUnion([children.key]),
+      });
+    }
 
     await FirebaseFirestore.instance.collection('Shuttle').doc(docID).update({
       'child_list': FieldValue.arrayUnion([children.key])
@@ -332,7 +355,11 @@ class ParentController extends AbstractController {
           child.phoneNumber = data['parentPhoneNumber'];
           child.hostessName = await getHostessName(element);
           child.hostessSurName = await getHostessSurName(element);
-          childrenList.add(child);
+          bool isActive = data['is_active'];
+          if(isActive){
+            childrenList.add(child);
+          }
+
         }
       }
     }

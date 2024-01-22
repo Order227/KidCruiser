@@ -50,7 +50,6 @@ class HostessController extends AbstractController{
           .get();
 
       if (myFirebase.querySnapshot.docs.isNotEmpty) {
-        print("BURDAYIM!!!");
         Map<String, dynamic> data = myFirebase.querySnapshot.docs
             .elementAt(0)
             .data() as Map<String, dynamic>;
@@ -61,7 +60,8 @@ class HostessController extends AbstractController{
         hostess.password = data['password'];
         hostess.phoneNumber = data['phoneNumber'];
         hostess.students = data['child_list'];
-        print("NABERRER1");
+        hostess.shuttleKey = data['shuttle_code'];
+        hostess.selectedSchool = null;
       }
 
       return myFirebase.querySnapshot.docs.isNotEmpty;
@@ -99,6 +99,7 @@ class HostessController extends AbstractController{
         hostess.password = inputController.passwordController.text;
         hostess.shuttleKey = inputController.shuttleCodeController.text;
 
+        //DEGISECEK!!!
         myFirebase.querySnapshot = await FirebaseFirestore.instance.collection('Shuttle')
             .where('shuttle_code', isEqualTo: hostess.shuttleKey).get();
 
@@ -114,6 +115,7 @@ class HostessController extends AbstractController{
           'password': hostess.password,
           'shuttle_code': hostess.shuttleKey,
           'child_list': childList,
+          'pending_list' : [],
         });
       }
       else

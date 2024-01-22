@@ -16,17 +16,17 @@ class HostessApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HostessScreen(),
+      home: HostessCheckChildPage(),
     );
   }
 }
 
-class HostessScreen extends StatefulWidget {
+class HostessCheckChildPage extends StatefulWidget {
   @override
-  _HostessScreenState createState() => _HostessScreenState();
+  _HostessCheckChildPageState createState() => _HostessCheckChildPageState();
 }
 
-class _HostessScreenState extends State<HostessScreen> {
+class _HostessCheckChildPageState extends State<HostessCheckChildPage> {
   HostessController hostessController = HostessController();
   List<Children> childrenList = [];
   bool isLoading = true;
